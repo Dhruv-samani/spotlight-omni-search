@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SpotlightItem } from '../types';
+import { spotlightStorage } from '../lib/storage';
 
 export interface UseRecentItemsOptions {
   /**
@@ -51,13 +52,11 @@ export function useRecentItems(options: UseRecentItemsOptions = {}): UseRecentIt
     if (!enabled) return;
 
     try {
-      const stored = localStorage.getItem(storageKey);
+      const stored = spotlightStorage.getItem<SpotlightItem[]>(storageKey);
       if (stored) {
-        const parsed = JSON.parse(stored);
-        setRecentItems(Array.isArray(parsed) ? parsed : []);
+        setRecentItems(Array.isArray(stored) ? stored : []);
       }
     } catch (error) {
-      console.warn('Failed to load recent items from localStorage:', error);
     }
   }, [storageKey, enabled]);
 
@@ -66,9 +65,8 @@ export function useRecentItems(options: UseRecentItemsOptions = {}): UseRecentIt
     if (!enabled) return;
 
     try {
-      localStorage.setItem(storageKey, JSON.stringify(recentItems));
+      spotlightStorage.setItem(storageKey, recentItems);
     } catch (error) {
-      console.warn('Failed to save recent items to localStorage:', error);
     }
   }, [recentItems, storageKey, enabled]);
 
@@ -76,11 +74,27 @@ export function useRecentItems(options: UseRecentItemsOptions = {}): UseRecentIt
     if (!enabled) return;
 
     setRecentItems((prev) => {
+      // Create a sanitized copy for storage (remove React nodes and functions)
+      // We only store the data needed to identify and display the text
+      const sanitizedItem: SpotlightItem = {
+          id: item.id,
+          label: item.label,
+          description: item.description,
+          type: item.type,
+          group: item.group,
+          keywords: item.keywords,
+          shortcut: item.shortcut,
+          // Exclude icon, action, component, etc.
+          // If we need an icon, we can rely on re-hydrating it from a registry if needed, 
+          // or just store a string identifier if the system supported it.
+          // For now, recent items might lose their dynamic icon if it was a ReactNode.
+      };
+
       // Remove if already exists (to move to top)
       const filtered = prev.filter((i) => i.id !== item.id);
       
       // Add to beginning
-      const updated = [item, ...filtered];
+      const updated = [sanitizedItem, ...filtered];
       
       // Limit to maxItems
       return updated.slice(0, maxItems);
@@ -90,9 +104,8 @@ export function useRecentItems(options: UseRecentItemsOptions = {}): UseRecentIt
   const clearRecent = useCallback(() => {
     setRecentItems([]);
     try {
-      localStorage.removeItem(storageKey);
+      spotlightStorage.removeItem(storageKey);
     } catch (error) {
-      console.warn('Failed to clear recent items from localStorage:', error);
     }
   }, [storageKey]);
 

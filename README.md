@@ -1,25 +1,21 @@
-# spotlight-omni-search 🔍 (v1.0.2)
+# spotlight-omni-search 🔍 (v2.1.0)
 
 A professional, **Tailwind-Native** Spotlight Search component for React and Next.js. Engineered to blend perfectly into your existing design system without shipping any global CSS resets or side effects.
 
-## 🆕 What's New in v1.0.2
+## 🆕 What's New in v2.0 (The Advanced Release)
 
-- **📦 Bundle Size Optimization**: Removed unused `framer-motion` dependency, reducing bundle size by ~60-80 KB!
-- **🧹 Code Cleanup**: Removed all debug console.log statements for production-ready code
-- **🐛 Bug Fixes**: Fixed array mutation bug and sticky header issues
-- **⌨️ Enhanced Navigation**: Added PageUp/PageDown keyboard support
-- **🎯 Improved UX**: Better scroll behavior and mouse hover tracking
+- **📡 Asynchronous Searching**: Built-in support for remote APIs with debouncing and result merging.
+- **⌨️ Command Arguments**: Execute actions with dynamic parameters (e.g., `Google hello world`).
+- **🛡️ Confirmation Modals**: Built-in safety for destructive actions with themed confirmation dialogs.
 
-### Previous Updates (v1.0.1)
+* **🍞 Internal Toast System**: Lightweight notifications for action feedback with external routing support.
 
-- **🎯 Fuzzy Search**: Intelligent VS Code-style character matching with relevance scoring
-- **📜 Recent Items**: Automatic tracking and display of recently selected items
-- **⚡ Built-in Actions**: Pre-built actions for theme toggle, navigation, utilities
-- **🔌 Enhanced Router Integration**: Better Next.js and React Router support
-- **⏳ Loading States**: Built-in skeleton loader for async data
-- **⌨️ Keyboard Shortcuts**: Display shortcut hints on items
-- **🎨 Custom Rendering**: Optional custom render function support
-- **🪝 useSpotlight Hook**: Simplified state management with built-in Cmd+K support
+- **🔄 Undo/Redo Support**: Deep search history tracking with `Cmd+Z` / `Cmd+Y`.
+- **🛠️ Developer Tools**: Real-time search latency benchmarks and raw scoring overlays.
+- **🎨 Theme System**: 10+ pre-built color schemes + CSS variable support.
+- **📱 Responsive & Touch**: Mobile-optimized with touch gestures (swipe-to-close).
+- **🔌 Plugin Architecture**: Build and inject custom middleware, custom search sources, and lifecycle hooks.
+- **🔒 Privacy Mode**: Automatic Base64 obfuscation for all `localStorage` data (History, Recents, Analytics).
 
 ---
 
@@ -30,7 +26,7 @@ This package is "Tailwind-Native". Instead of shipping a giant, compiled CSS fil
 ### Key Benefits:
 
 - **Zero Style Leaks**: No bundled resets. Your `body`, `button`, and `h1` styles remain yours.
-- **Microscopic Bundle Size**: Only ~9 KB total dependencies (clsx + tailwind-merge). Your Tailwind build handles the styles.
+- **Microscopic Bundle Size**: Only ~23 KB core logic. Your Tailwind build handles the styles.
 - **Perfect Design Parity**: Inherits your fonts, colors, and layout rules natively.
 
 ---
@@ -41,15 +37,13 @@ This package is "Tailwind-Native". Instead of shipping a giant, compiled CSS fil
 npm install spotlight-omni-search lucide-react
 ```
 
-> **Note**: `lucide-react` is a peer dependency. You need to install it separately to keep the bundle size small.
+> **Note**: `lucide-react` is a peer dependency.
 
 ## 🛠 Integration (Required)
 
-Because v3 uses standard Tailwind classes, you **must** tell Tailwind to scan the library for styles.
+Because v2 uses standard Tailwind classes, you **must** tell Tailwind to scan the library for styles.
 
 ### 1. Update `tailwind.config.js`
-
-Add the library path to your `content` array:
 
 ```javascript
 /** @type {import('tailwindcss').Config} */
@@ -59,13 +53,10 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
     "./node_modules/spotlight-omni-search/**/*.{js,ts,jsx,tsx}", // <--- ADD THIS
   ],
-  // ...
 };
 ```
 
-### 2. (Optional) Import Default Variables
-
-If you want to use our default colors, import the minimal variable sheet in your `layout.tsx` or `index.css`:
+### 2. Import Default Variables
 
 ```tsx
 import "spotlight-omni-search/dist/style.css";
@@ -73,326 +64,213 @@ import "spotlight-omni-search/dist/style.css";
 
 ---
 
-## 🌓 Customization
+## 🚀 Usage Example
 
-Since we use standard Tailwind, you can customize the theme using CSS variables in your global CSS:
-
-```css
-:root {
-  --spotlight-primary: #3b82f6;
-  --spotlight-background: #ffffff;
-}
-
-.dark {
-  --spotlight-background: #0f172a;
-}
-```
-
----
-
-## ✨ Features
-
-- **🎯 Fuzzy Search**: Intelligent character-by-character matching (like VS Code's Cmd+P)
-- **⚡ Smart Relevance**: Results sorted by match quality and position
-- **📜 Recent Items**: Automatically tracks and shows recently selected items
-- **⌨️ Keyboard Shortcuts**: Built-in Cmd+K / Ctrl+K support via `useSpotlight()` hook
-- **🎨 Tailwind-Native**: Zero style conflicts, inherits your design system
-- **📦 Tiny Bundle**: Only logic shipped, styles compiled by your Tailwind
-- **🔌 Router Agnostic**: Works with Next.js, React Router, or any navigation system
-
----
-
-## 🚀 Quick Start (Recommended)
-
-The easiest way to use this package is with the `useSpotlight()` hook:
+The most common way to use **Spotlight** is by using the `useSpotlight` hook to handle the keyboard shortcuts automatically.
 
 ```tsx
-"use client";
+import { Spotlight, useSpotlight, SpotlightItem } from "spotlight-omni-search";
+import { Home, Settings, Trash2, Search } from "lucide-react";
 
-import { useSpotlight, Spotlight, SpotlightItem } from "spotlight-omni-search";
-import { useRouter } from "next/navigation";
-import { Home, Settings, User } from "lucide-react";
-
-export function MyApp() {
-  const router = useRouter();
-  const { isOpen, close } = useSpotlight(); // ✨ Handles Cmd+K automatically!
+export default function App() {
+  const { isOpen, toggle, close } = useSpotlight(); // ✨ Handles Cmd+K / Ctrl+K
 
   const items: SpotlightItem[] = [
     {
       id: "home",
       label: "Home",
-      icon: <Home size={20} />,
+      icon: <Home size={18} />,
       type: "page",
       route: "/",
+      group: "Navigation",
     },
     {
       id: "settings",
       label: "Settings",
-      icon: <Settings size={20} />,
+      icon: <Settings size={18} />,
       type: "page",
       route: "/settings",
-    },
-  ];
-
-  return (
-    <Spotlight
-      isOpen={isOpen}
-      onClose={close}
-      items={items}
-      onNavigate={(path) => router.push(path)}
-    />
-  );
-}
-```
-
-**That's it!** Press `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) to open the spotlight.
-
-### Hook Options
-
-```tsx
-const { isOpen, open, close, toggle } = useSpotlight({
-  defaultOpen: false, // Initial state
-  shortcut: "cmd+k", // Keyboard shortcut
-  enableShortcut: true, // Enable/disable shortcut
-});
-```
-
----
-
-## 💡 Manual Setup (Advanced)
-
-If you need more control, you can manage state manually:
-
-Here is a complete, copy-pasteable example of how to use this in a Next.js app with `lucide-react`.
-
-### `components/CommandPalette.tsx`
-
-```tsx
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { CreditCard, Home, Settings, User, LogOut } from "lucide-react";
-
-// Import the component and types
-import { Spotlight, SpotlightItem } from "spotlight-omni-search";
-
-export function CommandPalette() {
-  const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
-
-  // 1. Define your items
-  const items: SpotlightItem[] = [
-    {
-      id: "home",
-      label: "Home",
-      description: "Go to dashboard",
-      icon: <Home size={20} />,
-      type: "page",
       group: "Navigation",
-      route: "/dashboard",
     },
     {
-      id: "profile",
-      label: "Profile",
-      description: "Manage your account",
-      icon: <User size={20} />,
-      type: "page",
-      group: "Navigation",
-      route: "/profile",
-    },
-    {
-      id: "billing",
-      label: "Billing",
-      description: "View invoices and plans",
-      icon: <CreditCard size={20} />,
-      type: "page",
-      group: "Navigation",
-      route: "/billing",
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      description: "App configuration",
-      icon: <Settings size={20} />,
-      type: "page",
-      group: "Navigation",
-      route: "/settings",
-    },
-    {
-      id: "logout",
-      label: "Log Out",
-      description: "Sign out of your account",
-      icon: <LogOut size={20} />,
+      id: "delete-data",
+      label: "Clear Cache",
+      icon: <Trash2 size={18} />,
       type: "action",
-      group: "Actions",
-      action: () => {
-        console.log("Logging out...");
-        // perform logout logic
+      group: "Danger Zone",
+      confirm: {
+        title: "Clear Cache?",
+        message: "This will reset your local application state.",
+        type: "danger",
       },
+      action: () => console.log("Cache Cleared!"),
     },
   ];
 
-  // 2. Handle Keyboard Shortcut (Cmd+K)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setIsOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  // 3. Render
   return (
-    <Spotlight
-      isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
-      items={items}
-      onNavigate={(path) => router.push(path)} // Determine how to navigate
-      searchPlaceholder="Type a command or search..."
-    />
+    <>
+      <button onClick={toggle}>Open Search</button>
+
+      <Spotlight
+        isOpen={isOpen}
+        onClose={close}
+        items={items}
+        onNavigate={(path) => router.push(path)}
+        theme="dark"
+        enableGoogleSearch={true} // 🔍 Built-in Google integration.
+        enableNumberJump={true} // ⌨️ Alt+1/2/3 to jump groups
+      />
+    </>
   );
 }
 ```
 
-Then simply drop `<CommandPalette />` into your root `layout.tsx` or `App.tsx`!
+---
+
+## ⚙️ API Reference
+
+### Spotlight Props
+
+| Prop                  | Type                     | Default     | Description                                   |
+| :-------------------- | :----------------------- | :---------- | :-------------------------------------------- |
+| `isOpen`              | `boolean`                | `required`  | Controls visibility                           |
+| `onClose`             | `() => void`             | `required`  | Close callback                                |
+| `items`               | `SpotlightItem[]`        | `required`  | List of items to search                       |
+| `onNavigate`          | `(path: string) => void` | `required`  | Navigation callback                           |
+| `theme`               | `string`                 | `'light'`   | Theme name (e.g., `dark`, `blue`, `red`)      |
+| `layout`              | `string`                 | `'center'`  | Layout mode (`center`, `top`, `bottom`, etc.) |
+| `enableGoogleSearch`  | `boolean`                | `false`     | Built-in "Search Google" option               |
+| `onSearch`            | `(q) => Promise`         | `undefined` | Async search callback                         |
+| `debounceTime`        | `number`                 | `300`       | Delay for async search in ms                  |
+| `debug`               | `boolean`                | `false`     | Shows search scores and latency               |
+| `onEvent`             | `(e, data) => void`      | `undefined` | Analytics/Event logging callback              |
+| `enableRecent`        | `boolean`                | `true`      | Show recently used items                      |
+| `enableVimNavigation` | `boolean`                | `false`     | Support `j`/`k` navigation                    |
+| `enableNumberJump`    | `boolean`                | `false`     | Jump to groups via number keys                |
+
+### SpotlightItem Options
+
+| Option             | Type                     | Description                               |
+| :----------------- | :----------------------- | :---------------------------------------- |
+| `id`               | `string`                 | Unique identifier (required)              |
+| `label`            | `string`                 | Primary display text (required)           |
+| `description`      | `string`                 | Secondary subtile text                    |
+| `icon`             | `ReactNode`              | Left-side icon                            |
+| `type`             | `string`                 | Metadata tag (e.g., "page", "action")     |
+| `group`            | `string`                 | Header category for sorting               |
+| `action`           | `(args: string) => void` | Function to run on selection              |
+| `route`            | `string`                 | Path to navigate to                       |
+| `confirm`          | `ConfirmOptions`         | Adds a confirmation step before action    |
+| `expectsArguments` | `boolean`                | Capture trailing text as action arguments |
 
 ---
 
-## 🔌 Router Integration
+## 🔒 Privacy & Storage
 
-### Next.js with Manual Routes
+Spotlight automatically **obfuscates** data stored in `localStorage` (like search history and recent items). This ensures that user data is not human-readable when inspecting the browser's "Application" tab, providing an extra layer of privacy for your users.
+
+- **Non-Readable**: Search queries are encoded to prevent casual inspection.
+- **Zero Dependencies**: Uses native browser APIs for lightweight obfuscation.
+- **Plugin Support**: Data stored via the Plugin API is also automatically obfuscated.
+
+---
+
+## 🚀 Advanced Features Quick Reference
+
+### 1. Asynchronous Search
+
+Fetch data from your API as the user types.
 
 ```tsx
-import {
-  getSpotlightItemsFromRoutes,
-  RouteConfig,
-} from "spotlight-omni-search";
-import { Home, Settings, Users } from "lucide-react";
+<Spotlight
+  onSearch={async (query) => {
+    const res = await fetch(`/api/search?q=${query}`);
+    return await res.json();
+  }}
+  debounceTime={500}
+/>
+```
 
-const routes: RouteConfig[] = [
+### 2. Command Arguments
+
+Allow items to receive parameters from the search query.
+
+```tsx
+const items = [
   {
-    path: "/",
-    label: "Home",
-    icon: <Home size={20} />,
-  },
-  {
-    path: "/settings",
-    label: "Settings",
-    description: "Manage your preferences",
-    icon: <Settings size={20} />,
-  },
-  {
-    path: "/admin",
-    label: "Admin Panel",
-    hidden: true, // Won't appear in spotlight
+    id: "google",
+    label: "Google Search",
+    expectsArguments: true,
+    action: (args) => window.open(`https://google.com/search?q=${args}`),
   },
 ];
-
-const spotlightItems = getSpotlightItemsFromRoutes(routes);
 ```
 
-### React Router v6
+### 3. Action Confirmation
+
+Safeguard destructive actions like "Delete".
 
 ```tsx
-import { createBrowserRouter } from "react-router-dom";
-import {
-  getSpotlightItemsFromRoutes,
-  RouterHandle,
-} from "spotlight-omni-search";
-
-const routes = [
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
-    handle: {
-      spotlight: {
-        label: "Dashboard",
-        description: "View your dashboard",
-        icon: <HomeIcon />,
-        keywords: ["home", "overview"],
-      },
-    } satisfies RouterHandle,
+{
+  id: "delete",
+  label: "Delete App Data",
+  confirm: {
+    title: "Are you sure?",
+    message: "This cannot be undone.",
+    confirmLabel: "Delete Everything",
+    type: "danger"
   },
-];
+  action: () => resetData()
+}
+```
 
-const router = createBrowserRouter(routes);
-const spotlightItems = getSpotlightItemsFromRoutes(routes);
+### 4. Plugin System
+
+Extend Spotlight with custom logic or external integrations.
+
+```tsx
+import { AnalyticsPlugin } from "spotlight-omni-search/plugins";
+
+<Spotlight
+  plugins={[
+    AnalyticsPlugin({
+      onSelect: (id, type) => console.log(`Selected ${id}`),
+    }),
+  ]}
+/>;
 ```
 
 ---
 
-## ⚡ Built-in Actions
+## 🎨 Themes & Customization
 
-Use pre-built actions for common functionality:
-
-```tsx
-import {
-  createCommonActions,
-  createThemeActions,
-  createUtilityActions,
-} from "spotlight-omni-search";
-
-// All common actions at once
-const actions = createCommonActions({
-  currentTheme: theme,
-  onToggle: (newTheme) => setTheme(newTheme),
-});
-
-// Or pick specific action groups
-const themeActions = createThemeActions({
-  currentTheme: theme,
-  onToggle: setTheme,
-});
-
-const utilityActions = createUtilityActions(); // Copy URL, Print, Reload
-
-// Combine with your pages
-const allItems = [...pages, ...actions];
-```
-
-**Available Actions:**
-
-- 🌓 Theme toggle (dark/light)
-- ⬅️ Navigate back/forward
-- ⬆️ Scroll to top/bottom
-- 📋 Copy current URL
-- 🖨️ Print page
-- 🔄 Reload page
+**Available Themes**: `light`, `dark`, `slate`, `red`, `rose`, `orange`, `amber`, `yellow`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `ocean`, `forest`, `sunset`, `midnight`.
 
 ---
 
-## ⏳ Loading States
+## 📐 Layouts
 
-Handle async data loading with built-in loading UI:
+Choose from 7 different layout modes:
+| Layout | Description |
+| :----------- | :--------------------------------- |
+| `center` | Standard centered modal (Default) |
+| `top` | Aligned to the top of the viewport |
+| `bottom` | Mobile-friendly bottom sheet |
+| `side-left` | Slide-in panel from the left |
+| `side-right` | Slide-in panel from the right |
+| `fullscreen` | Takes up the entire screen |
+| `compact` | Minimalist, smaller footprint |
 
-```tsx
-const [items, setItems] = useState<SpotlightItem[]>([]);
-const [isLoading, setIsLoading] = useState(false);
+---
 
-useEffect(() => {
-  async function loadItems() {
-    setIsLoading(true);
-    const data = await fetchItemsFromAPI();
-    setItems(data);
-    setIsLoading(false);
-  }
-  loadItems();
-}, []);
+## ⌨️ Shortcuts
 
-return (
-  <Spotlight
-    isOpen={isOpen}
-    onClose={close}
-    items={items}
-    isLoading={isLoading} // Shows skeleton loader
-    onNavigate={(path) => router.push(path)}
-  />
-);
-```
+- **Cmd+K / Ctrl+K**: Open Spotlight
+- **Cmd+Z**: Undo search text
+- **Cmd+Shift+Z / Cmd+Y**: Redo search text
+- **Up/Down / Tab / Shift+Tab**: Navigate items
+- **Enter**: Select / Confirm action
+- **Esc**: Close / Cancel
 
 ---
 

@@ -95,11 +95,11 @@ export interface ScoredItem {
 
 /**
  * Filters and sorts items using fuzzy search
- * Returns items sorted by relevance score
+ * Returns scored items with match information for highlighting
  */
-export function fuzzyFilter(items: SpotlightItem[], query: string): SpotlightItem[] {
+export function fuzzyFilter(items: SpotlightItem[], query: string): ScoredItem[] {
   if (!query.trim()) {
-    return items;
+    return items.map(item => ({ item, score: 0, matches: [] }));
   }
 
   const scored: ScoredItem[] = [];
@@ -125,5 +125,67 @@ export function fuzzyFilter(items: SpotlightItem[], query: string): SpotlightIte
     return groupA.localeCompare(groupB);
   });
 
-  return scored.map(s => s.item);
+  return scored;
 }
+
+/**
+ * Filters and sorts items, returning only the items (for backward compatibility)
+ */
+export function fuzzyFilterItems(items: SpotlightItem[], query: string): SpotlightItem[] {
+  return fuzzyFilter(items, query).map(s => s.item);
+}
+
+/**
+ * Filters and sorts items using regex
+ * Returns scored items (score = 1 for match) with match indices
+ */
+export function regexFilter(items: SpotlightItem[], pattern: string): ScoredItem[] {
+  try {
+    const regex = new RegExp(pattern, 'i');
+    const scored: ScoredItem[] = [];
+
+    for (const item of items) {
+      let matched = false;
+      const matches: number[] = [];
+
+      // Check label
+      const labelMatch = item.label.match(regex);
+      if (labelMatch && labelMatch.index !== undefined) {
+        matched = true;
+        for (let i = 0; i < labelMatch[0].length; i++) {
+          matches.push(labelMatch.index + i);
+        }
+      }
+
+      // Check description
+      if (!matched && item.description && regex.test(item.description)) {
+        matched = true;
+      }
+      
+      // Keywords
+      if (!matched && item.keywords && item.keywords.some(k => regex.test(k))) {
+        matched = true;
+      }
+
+      if (matched) {
+        scored.push({
+          item,
+          score: 1,
+          matches,
+        });
+      }
+    }
+
+    // Sort by group
+    scored.sort((a, b) => {
+      const groupA = a.item.group || 'Other';
+      const groupB = b.item.group || 'Other';
+      return groupA.localeCompare(groupB);
+    });
+
+    return scored;
+  } catch (e) {
+    return [];
+  }
+}
+
