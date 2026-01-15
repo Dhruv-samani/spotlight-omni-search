@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotlight Playground</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              background: "var(--background)",
+              foreground: "var(--foreground)",
+              muted: "var(--muted)",
+              "muted-foreground": "var(--muted-foreground)",
+              popover: "var(--popover)",
+              "popover-foreground": "var(--popover-foreground)",
+              card: "var(--card)",
+              "card-foreground": "var(--card-foreground)",
+              border: "var(--border)",
+              input: "var(--input)",
+              primary: "var(--primary)",
+              "primary-foreground": "var(--primary-foreground)",
+              secondary: "var(--secondary)",
+              "secondary-foreground": "var(--secondary-foreground)",
+              accent: "var(--accent)",
+              "accent-foreground": "var(--accent-foreground)",
+              destructive: "var(--destructive)",
+              "destructive-foreground": "var(--destructive-foreground)",
+              ring: "var(--ring)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root {
+        --background: #ffffff;
+        --foreground: #0f172a;
+        --muted: #f1f5f9;
+        --muted-foreground: #64748b;
+        --popover: #ffffff;
+        --popover-foreground: #0f172a;
+        --card: #ffffff;
+        --card-foreground: #0f172a;
+        --border: #e2e8f0;
+        --input: #e2e8f0;
+        --primary: #0f172a;
+        --primary-foreground: #f8fafc;
+        --secondary: #f1f5f9;
+        --secondary-foreground: #0f172a;
+        --accent: #f1f5f9;
+        --accent-foreground: #0f172a;
+        --destructive: #ef4444;
+        --destructive-foreground: #f8fafc;
+        --ring: #94a3b8;
+      }
+
+      .dark {
+        --background: #020817;
+        --foreground: #f8fafc;
+        --muted: #1e293b;
+        --muted-foreground: #94a3b8;
+        --popover: #020817;
+        --popover-foreground: #f8fafc;
+        --card: #020817;
+        --card-foreground: #f8fafc;
+        --border: #1e293b;
+        --input: #1e293b;
+        --primary: #f8fafc;
+        --primary-foreground: #0f172a;
+        --secondary: #1e293b;
+        --secondary-foreground: #f8fafc;
+        --accent: #1e293b;
+        --accent-foreground: #f8fafc;
+        --destructive: #7f1d1d;
+        --destructive-foreground: #f8fafc;
+        --ring: #1e293b;
+      }
+
+      /* animation utility classes usually in tailwind plugin */
+      .animate-in {
+        animation-name: enter;
+        animation-duration: 150ms;
+        --tw-enter-opacity: initial;
+        --tw-enter-scale: initial;
+        --tw-enter-rotate: initial;
+        --tw-enter-translate-x: initial;
+        --tw-enter-translate-y: initial;
+      }
+      .fade-in {
+        --tw-enter-opacity: 0;
+      }
+      .zoom-in-95 {
+        --tw-enter-scale: 0.95;
+      }
+
+      @keyframes enter {
+        from {
+          opacity: var(--tw-enter-opacity, 1);
+          transform: translate3d(
+              var(--tw-enter-translate-x, 0),
+              var(--tw-enter-translate-y, 0),
+              0
+            )
+            scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), 1)
+            rotate(var(--tw-enter-rotate, 0));
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/main.tsx"></script>
+  </body>
+</html>

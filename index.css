@@ -1,0 +1,41 @@
+:root {
+  --spotlight-background: #ffffff;
+  --spotlight-foreground: #020817;
+  --spotlight-muted: #f1f5f9;
+  --spotlight-muted-foreground: #64748b;
+  --spotlight-popover: #ffffff;
+  --spotlight-border: #e2e8f0;
+  --spotlight-accent: #f1f5f9;
+  --spotlight-accent-foreground: #0f172a;
+  --spotlight-ring: #94a3b8;
+  --spotlight-primary: #0f172a;
+}
+
+.dark {
+  --spotlight-background: #020817;
+  --spotlight-foreground: #f8fafc;
+  --spotlight-muted: #1e293b;
+  --spotlight-muted-foreground: #94a3b8;
+  --spotlight-popover: #020817;
+  --spotlight-border: #1e293b;
+  --spotlight-accent: #1e293b;
+  --spotlight-accent-foreground: #f8fafc;
+  --spotlight-ring: #1e293b;
+  --spotlight-primary: #f8fafc;
+}
+
+/* Support for system theme */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --spotlight-background: #020817;
+    --spotlight-foreground: #f8fafc;
+    --spotlight-muted: #1e293b;
+    --spotlight-muted-foreground: #94a3b8;
+    --spotlight-popover: #020817;
+    --spotlight-border: #1e293b;
+    --spotlight-accent: #1e293b;
+    --spotlight-accent-foreground: #f8fafc;
+    --spotlight-ring: #1e293b;
+    --spotlight-primary: #f8fafc;
+  }
+}
