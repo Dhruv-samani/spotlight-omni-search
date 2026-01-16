@@ -12,18 +12,17 @@ export default defineConfig(({ command }) => ({
   build: {
     lib: {
       entry: path.resolve(__dirname, "index.ts"),
-      name: "AuraSpotlight",
+      name: "Spotlight",
       fileName: (format) => `index.${format === "es" ? "mjs" : "umd.js"}`,
       formats: ["es", "umd"],
     },
     rollupOptions: {
-      external: ["react", "react-dom", "lucide-react", "react/jsx-runtime"],
+      external: ["react", "react-dom", "lucide-react"],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
           "lucide-react": "LucideReact",
-          "react/jsx-runtime": "jsxRuntime",
         },
       },
     },

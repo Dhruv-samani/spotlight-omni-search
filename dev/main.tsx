@@ -14,6 +14,7 @@ import {
     Github,
     ExternalLink,
     Copy,
+    Check,
     Shield,
     History,
     Zap,
@@ -47,6 +48,9 @@ function App() {
     const [enableGoogle, setEnableGoogle] = useState(true);
     const [enableVim, setEnableVim] = useState(false);
     const [enableRecent, setEnableRecent] = useState(true);
+    const [headless, setHeadless] = useState(false);
+    const [useLargeDataset, setUseLargeDataset] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const items: SpotlightItem[] = useMemo(() => [
         { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation' },
@@ -65,12 +69,38 @@ function App() {
         },
     ], []);
 
+    // Generate large dataset for virtual scrolling testing
+    const largeDataset: SpotlightItem[] = useMemo(() => {
+        const items: SpotlightItem[] = [];
+        const groups = ['Navigation', 'System', 'Quick Actions', 'External', 'Reports', 'Settings', 'Tools'];
+        const types = ['page', 'action', 'user', 'tenant'];
+
+        for (let i = 1; i <= 1000; i++) {
+            items.push({
+                id: `item-${i}`,
+                label: `Item ${i} - ${['Dashboard', 'Analytics', 'Settings', 'Profile', 'Reports', 'Tools'][i % 6]}`,
+                description: `Description for item ${i}`,
+                type: types[i % types.length],
+                group: groups[i % groups.length],
+            });
+        }
+        return items;
+    }, []);
+
+    const activeItems = useLargeDataset ? largeDataset : items;
+
     const plugins = useMemo(() => [
         AnalyticsPlugin({
             onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
             onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
         })
     ], []);
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(codeSnippet);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     // ⌨️ Global Keyboard Shortcut
     useEffect(() => {
@@ -94,6 +124,7 @@ function App() {
   enableGoogleSearch={${enableGoogle}}
   enableVimNavigation={${enableVim}}
   enableRecent={${enableRecent}}
+  headless={${headless}}
   items={items}
 />`;
 
@@ -108,7 +139,7 @@ function App() {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">Spotlight <span className="gradient-text">Playground</span></h1>
-                            <p className="text-xs opacity-50 font-mono">v2.1.1 Production v.11</p>
+                            <p className="text-xs opacity-50 font-mono">v2.1.4 Production v.11</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -181,6 +212,8 @@ function App() {
                                     { id: 'google', label: 'Google Search', desc: 'Allow direct web search fallback', icon: <Smartphone size={18} />, value: enableGoogle, setter: setEnableGoogle },
                                     { id: 'history', label: 'Record History', desc: 'Persist search queries locally', icon: <History size={18} />, value: enableRecent, setter: setEnableRecent },
                                     { id: 'vim', label: 'Vim Navigation', desc: 'Support h, j, k, l movement', icon: <Zap size={18} />, value: enableVim, setter: setEnableVim },
+                                    { id: 'headless', label: 'Headless Mode', desc: 'Remove default styling (bring your own CSS)', icon: <Code size={18} />, value: headless, setter: setHeadless },
+                                    { id: 'largedata', label: 'Large Dataset (1000 items)', desc: 'Test virtual scrolling performance', icon: <Monitor size={18} />, value: useLargeDataset, setter: setUseLargeDataset },
                                 ].map((f) => (
                                     <div key={f.id} className="glass-card p-6 flex items-start justify-between">
                                         <div className="flex items-start gap-4">
@@ -213,8 +246,12 @@ function App() {
                                     <Code size={14} />
                                     <span>COMPONENT_CONFIG.TSX</span>
                                 </div>
-                                <button className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">
-                                    <Copy size={14} />
+                                <button
+                                    onClick={handleCopy}
+                                    className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors flex items-center gap-1.5"
+                                >
+                                    {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                                    {copied && <span className="text-[10px] font-medium text-emerald-500">Copied!</span>}
                                 </button>
                             </div>
                             <div className="p-6">
@@ -258,7 +295,17 @@ function App() {
                 enableGoogleSearch={enableGoogle}
                 enableVimNavigation={enableVim}
                 enableRecent={enableRecent}
-                items={items}
+                headless={headless}
+                classNames={headless ? {
+                    backdrop: 'fixed inset-0 bg-black/50',
+                    container: 'bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl mx-auto mt-20 p-4',
+                    header: 'flex items-center gap-2 mb-4',
+                    input: 'w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg',
+                    listContainer: 'max-h-96 overflow-y-auto',
+                    item: 'px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded',
+                    itemSelected: 'px-4 py-2 bg-blue-500 text-white cursor-pointer rounded',
+                } : undefined}
+                items={activeItems}
                 plugins={plugins}
             />
         </div>

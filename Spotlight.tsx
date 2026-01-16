@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, ReactNode } from 'react';
 import { Search, X, Regex, Filter } from 'lucide-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { cn } from './lib/utils';
 import { SpotlightItem, SpotlightProps } from './types';
 import { fuzzyFilter, ScoredItem, regexFilter } from './lib/fuzzySearch';
@@ -71,7 +72,25 @@ export function Spotlight({
     onEvent,
     onToast,
     enableGoogleSearch = false,
+    // Headless Mode
+    headless = false,
+    classNames,
+    // Virtual Scrolling
+    enableVirtualScrolling = 'auto',
+    virtualScrollThreshold = 500,
+    virtualScrollOverscan = 5,
 }: SpotlightProps) {
+    // Helper to merge classes based on headless mode
+    const mergeClasses = useCallback((defaultClasses: string, customKey?: keyof import('./types').SpotlightClassNames) => {
+        if (headless) {
+            // In headless mode, only use custom classes
+            return customKey && classNames?.[customKey] ? classNames[customKey] : '';
+        }
+        // In normal mode, merge default with custom
+        return customKey && classNames?.[customKey]
+            ? cn(defaultClasses, classNames[customKey])
+            : defaultClasses;
+    }, [headless, classNames]);
     const [query, setQuery] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [regexMode, setRegexMode] = useState(false);
@@ -265,6 +284,23 @@ export function Spotlight({
         searchTimeRef.current = performance.now() - start;
         return finalResults;
     }, [query, items, enableRecent, recentItems, regexMode, activeGroup, runOnBeforeSearch, runOnAfterSearch, asyncResults, enableGoogleSearch]);
+
+    // Virtual Scrolling Logic
+    const shouldUseVirtual = useMemo(() => {
+        if (enableVirtualScrolling === false) return false;
+        if (enableVirtualScrolling === true) return true;
+        // Auto mode: enable when items exceed threshold
+        return filteredItems.length > virtualScrollThreshold;
+    }, [enableVirtualScrolling, filteredItems.length, virtualScrollThreshold]);
+
+    // Initialize virtualizer
+    const virtualizer = useVirtualizer({
+        count: filteredItems.length,
+        getScrollElement: () => listRef.current,
+        estimateSize: () => 50, // Approximate item height in pixels
+        overscan: virtualScrollOverscan,
+        enabled: shouldUseVirtual,
+    });
 
     // Reset state when opened
     useEffect(() => {
@@ -463,18 +499,25 @@ export function Spotlight({
     // Scroll into view
     useEffect(() => {
         if (filteredItems.length > 0 && interactionMode.current === 'keyboard') {
-            const activeItemId = `${listId}-item-${selectedIndex}`;
-            const activeItem = document.getElementById(activeItemId);
-
-            if (activeItem) {
-                // Use scrollIntoView with smoother behavior? 
-                // block: 'nearest' is standard.
-                activeItem.scrollIntoView({
-                    block: 'nearest',
+            if (shouldUseVirtual) {
+                // Use virtualizer's scrollToIndex for virtual scrolling
+                virtualizer.scrollToIndex(selectedIndex, {
+                    align: 'auto',
+                    behavior: 'smooth',
                 });
+            } else {
+                // Use native scrollIntoView for normal mode
+                const activeItemId = `${listId}-item-${selectedIndex}`;
+                const activeItem = document.getElementById(activeItemId);
+
+                if (activeItem) {
+                    activeItem.scrollIntoView({
+                        block: 'nearest',
+                    });
+                }
             }
         }
-    }, [selectedIndex, filteredItems, listId]);
+    }, [selectedIndex, filteredItems, listId, shouldUseVirtual, virtualizer]);
 
     // Accessibility Hooks
     const modalRef = useFocusTrap(isOpen);
@@ -580,13 +623,13 @@ export function Spotlight({
     return (
         <div
             style={themeStyles}
-            className={layoutClasses.outer}
+            className={mergeClasses(layoutClasses.outer, 'backdrop')}
             onClick={onClose}
             aria-hidden="true"
         >
             <div
                 ref={setRefs}
-                className={layoutClasses.inner}
+                className={mergeClasses(layoutClasses.inner, 'container')}
                 onClick={e => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
@@ -598,8 +641,8 @@ export function Spotlight({
                     if (pluginHeader) return pluginHeader;
 
                     const defaultHeader = (
-                        <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-                            <Search className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                        <div className={mergeClasses("flex items-center gap-3 px-4 py-3 border-b border-border", 'header')}>
+                            <Search className={mergeClasses("w-5 h-5 text-muted-foreground", 'searchIcon')} aria-hidden="true" />
                             <input
                                 ref={inputRef}
                                 id={inputId}
@@ -616,7 +659,7 @@ export function Spotlight({
                                     setQuery(next);
                                 }}
                                 placeholder={searchPlaceholder}
-                                className="flex-1 bg-transparent border-none outline-none text-base placeholder:text-muted-foreground"
+                                className={mergeClasses("flex-1 bg-transparent border-none outline-none text-base placeholder:text-muted-foreground", 'input')}
                                 autoFocus
                                 role="combobox"
                                 aria-autocomplete="list"
@@ -694,16 +737,16 @@ export function Spotlight({
 
                 {/* Filters & Regex Toggle */}
                 {items.length > 0 && (
-                    <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20 overflow-x-auto no-scrollbar scroll-fade">
+                    <div className={mergeClasses("flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20 overflow-x-auto no-scrollbar scroll-fade", 'filtersBar')}>
                         {/* Regex Toggle */}
                         <button
                             onClick={() => setRegexMode(!regexMode)}
-                            className={cn(
+                            className={mergeClasses(cn(
                                 "flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors border",
                                 regexMode
                                     ? "bg-primary text-primary-foreground border-primary"
                                     : "bg-background text-muted-foreground border-border hover:border-primary/50"
-                            )}
+                            ), 'regexButton')}
                             title="Toggle Regex Search"
                         >
                             <Regex size={12} />
@@ -715,12 +758,12 @@ export function Spotlight({
                         {/* Group Filters */}
                         <button
                             onClick={() => setActiveGroup(null)}
-                            className={cn(
+                            className={mergeClasses(cn(
                                 "px-2 py-1 rounded text-[10px] font-medium transition-colors whitespace-nowrap",
                                 !activeGroup
                                     ? "bg-accent text-accent-foreground"
                                     : "text-muted-foreground hover:text-foreground"
-                            )}
+                            ), activeGroup ? 'groupButton' : 'groupButtonActive')}
                         >
                             All
                         </button>
@@ -728,12 +771,12 @@ export function Spotlight({
                             <button
                                 key={group.value}
                                 onClick={() => setActiveGroup(activeGroup === group.value ? null : group.value)}
-                                className={cn(
+                                className={mergeClasses(cn(
                                     "px-2 py-1 rounded text-[10px] font-medium transition-colors whitespace-nowrap flex items-center gap-1",
                                     activeGroup === group.value
                                         ? "bg-accent text-accent-foreground"
                                         : "text-muted-foreground hover:text-foreground"
-                                )}
+                                ), activeGroup === group.value ? 'groupButtonActive' : 'groupButton')}
                             >
                                 <span>{group.label}</span>
                                 <span className="opacity-50 text-[9px] ml-0.5">({group.count})</span>
@@ -750,23 +793,111 @@ export function Spotlight({
                 {/* Results List */}
                 <div
                     ref={listRef}
-                    className="max-h-[65vh] sm:max-h-[60vh] overflow-y-auto p-2"
+                    className={mergeClasses("max-h-[65vh] sm:max-h-[60vh] overflow-y-auto p-2", 'listContainer')}
                     role="listbox"
                     id={listId}
                 >
                     {(isLoading || (isAsyncLoading && filteredItems.length === 0)) ? (
                         renderLoading ? renderLoading() : (
-                            <div className="py-12 flex justify-center text-muted-foreground" role="status" aria-label="Loading">
+                            <div className={mergeClasses("py-12 flex justify-center text-muted-foreground", 'loading')} role="status" aria-label="Loading">
                                 <div className="animate-spin w-6 h-6 border-2 border-current border-t-transparent rounded-full" />
                             </div>
                         )
                     ) : filteredItems.length === 0 ? (
                         renderEmpty ? renderEmpty() : (
-                            <div className="py-12 text-center text-sm text-muted-foreground" role="presentation">
+                            <div className={mergeClasses("py-12 text-center text-sm text-muted-foreground", 'empty')} role="presentation">
                                 No results found.
                             </div>
                         )
+                    ) : shouldUseVirtual ? (
+                        // Virtual Scrolling Mode
+                        <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
+                            {virtualizer.getVirtualItems().map((virtualRow) => {
+                                const index = virtualRow.index;
+                                const scoredItem = filteredItems[index];
+                                const { item, matches } = scoredItem;
+                                const showHeader = index === 0 || item.group !== filteredItems[index - 1].item.group;
+
+                                return (
+                                    <div
+                                        key={item.id}
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            transform: `translateY(${virtualRow.start}px)`,
+                                        }}
+                                        data-index={index}
+                                        ref={virtualizer.measureElement}
+                                    >
+                                        {showHeader && (item.group || 'Other') && (
+                                            <div className={mergeClasses("px-2 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 mt-2 first:mt-0", 'groupHeader')} role="group" aria-label={item.group || 'Group'}>
+                                                {renderGroupHeader ? renderGroupHeader(item.group || 'Other') : (item.group || 'Other')}
+                                            </div>
+                                        )}
+                                        <div
+                                            id={`${listId}-item-${index}`}
+                                            role="option"
+                                            aria-selected={selectedIndex === index}
+                                            onClick={() => executeItem(item)}
+                                            onMouseEnter={() => {
+                                                interactionMode.current = 'mouse';
+                                                setSelectedIndex(index);
+                                            }}
+                                            className={mergeClasses(cn(
+                                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer select-none group w-full text-left",
+                                                selectedIndex === index
+                                                    ? "bg-accent/80 text-accent-foreground"
+                                                    : "text-foreground hover:bg-accent/80 hover:text-accent-foreground",
+                                                item.disabled && "opacity-50 cursor-not-allowed pointer-events-none"
+                                            ), selectedIndex === index ? 'itemSelected' : 'item')}
+                                        >
+                                            {renderItem ? renderItem(item, index === selectedIndex) : (
+                                                <>
+                                                    <div className={mergeClasses(cn(
+                                                        "flex h-8 w-8 items-center justify-center rounded-md border border-border shrink-0 transition-colors",
+                                                        selectedIndex === index ? "bg-background border-primary/20" : "bg-muted"
+                                                    ), 'itemIcon')}>
+                                                        {item.icon || <Search size={14} />}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className={mergeClasses("truncate font-medium flex items-center gap-2", 'itemLabel')}>
+                                                            <span>{query.trim() && matches.length > 0 ? highlightMatches(item.label, matches) : item.label}</span>
+                                                            {item.type && (
+                                                                <span className="text-[10px] uppercase text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border/50">
+                                                                    {item.type}
+                                                                </span>
+                                                            )}
+                                                            {debug && (
+                                                                <span className="text-[9px] font-mono text-primary bg-primary/10 px-1 rounded border border-primary/20">
+                                                                    S:{scoredItem.score}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {item.description && (
+                                                            <div className={mergeClasses("truncate text-xs text-muted-foreground mt-0.5", 'itemDescription')}>
+                                                                {item.description}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {item.shortcut && (
+                                                        <kbd className={mergeClasses(cn(
+                                                            "hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium transition-colors",
+                                                            selectedIndex === index ? "border-primary/20 bg-background text-foreground" : "border-border bg-muted text-muted-foreground"
+                                                        ), 'itemShortcut')}>
+                                                            {item.shortcut}
+                                                        </kbd>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     ) : (
+                        // Normal Rendering Mode
                         filteredItems.map((scoredItem: ScoredItem, index: number) => {
                             const { item, matches } = scoredItem;
                             // Check if we need to render a header
@@ -775,7 +906,7 @@ export function Spotlight({
                             return (
                                 <React.Fragment key={item.id}>
                                     {showHeader && (item.group || 'Other') && (
-                                        <div className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 mt-2 first:mt-0" role="group" aria-label={item.group || 'Group'}>
+                                        <div className={mergeClasses("px-2 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1 mt-2 first:mt-0", 'groupHeader')} role="group" aria-label={item.group || 'Group'}>
                                             {renderGroupHeader ? renderGroupHeader(item.group || 'Other') : (item.group || 'Other')}
                                         </div>
                                     )}
@@ -788,25 +919,25 @@ export function Spotlight({
                                             interactionMode.current = 'mouse';
                                             setSelectedIndex(index);
                                         }}
-                                        className={cn(
+                                        className={mergeClasses(cn(
                                             "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer select-none group w-full text-left",
                                             selectedIndex === index
                                                 ? "bg-accent/80 text-accent-foreground"
                                                 // Make hover state identical to selected state immediately
                                                 : "text-foreground hover:bg-accent/80 hover:text-accent-foreground",
                                             item.disabled && "opacity-50 cursor-not-allowed pointer-events-none"
-                                        )}
+                                        ), selectedIndex === index ? 'itemSelected' : 'item')}
                                     >
                                         {renderItem ? renderItem(item, index === selectedIndex) : (
                                             <>
-                                                <div className={cn(
+                                                <div className={mergeClasses(cn(
                                                     "flex h-8 w-8 items-center justify-center rounded-md border border-border shrink-0 transition-colors",
                                                     selectedIndex === index ? "bg-background border-primary/20" : "bg-muted"
-                                                )}>
+                                                ), 'itemIcon')}>
                                                     {item.icon || <Search size={14} />}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="truncate font-medium flex items-center gap-2">
+                                                    <div className={mergeClasses("truncate font-medium flex items-center gap-2", 'itemLabel')}>
                                                         <span>{query.trim() && matches.length > 0 ? highlightMatches(item.label, matches) : item.label}</span>
                                                         {item.type && (
                                                             <span className="text-[10px] uppercase text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border/50">
@@ -820,16 +951,16 @@ export function Spotlight({
                                                         )}
                                                     </div>
                                                     {item.description && (
-                                                        <div className="truncate text-xs text-muted-foreground mt-0.5">
+                                                        <div className={mergeClasses("truncate text-xs text-muted-foreground mt-0.5", 'itemDescription')}>
                                                             {item.description}
                                                         </div>
                                                     )}
                                                 </div>
                                                 {item.shortcut && (
-                                                    <kbd className={cn(
+                                                    <kbd className={mergeClasses(cn(
                                                         "hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium transition-colors",
                                                         selectedIndex === index ? "border-primary/20 bg-background text-foreground" : "border-border bg-muted text-muted-foreground"
-                                                    )}>
+                                                    ), 'itemShortcut')}>
                                                         {item.shortcut}
                                                     </kbd>
                                                 )}
@@ -847,7 +978,7 @@ export function Spotlight({
 
                 {/* Footer */}
                 {renderFooter ? renderFooter() : (
-                    <div className="h-10 border-t border-border bg-muted/30 px-4 flex items-center justify-between text-[10px] text-muted-foreground">
+                    <div className={mergeClasses("h-10 border-t border-border bg-muted/30 px-4 flex items-center justify-between text-[10px] text-muted-foreground", 'footer')}>
                         <div className="flex gap-2">
                             <span>Use arrow keys to navigate</span>
                             <span>Enter to select</span>
@@ -869,8 +1000,8 @@ export function Spotlight({
 
                 {/* Confirmation Modal Overlay */}
                 {pendingAction && (
-                    <div className="absolute inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in zoom-in duration-200">
-                        <div className="max-w-sm w-full bg-card border border-border rounded-xl shadow-2xl p-6 space-y-4">
+                    <div className={mergeClasses("absolute inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in zoom-in duration-200", 'confirmationOverlay')}>
+                        <div className={mergeClasses("max-w-sm w-full bg-card border border-border rounded-xl shadow-2xl p-6 space-y-4", 'confirmationContainer')}>
                             <div className="space-y-2">
                                 <h3 className="text-lg font-semibold">{pendingAction.item.confirm?.title || 'Confirm Action'}</h3>
                                 <p className="text-sm text-muted-foreground">{pendingAction.item.confirm?.message || 'Are you sure you want to proceed?'}</p>
@@ -907,14 +1038,14 @@ export function Spotlight({
 
                 {/* Internal Toasts */}
                 {!onToast && toasts.length > 0 && (
-                    <div className="absolute bottom-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none">
+                    <div className={mergeClasses("absolute bottom-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none", 'toastContainer')}>
                         {toasts.map(toast => (
                             <div
                                 key={toast.id}
-                                className={cn(
+                                className={mergeClasses(cn(
                                     "px-4 py-2 rounded-lg shadow-lg text-sm font-medium text-white animate-in slide-in-from-right-4 pointer-events-auto",
                                     toast.type === 'success' ? "bg-green-600" : toast.type === 'error' ? "bg-red-600" : "bg-blue-600"
-                                )}
+                                ), 'toast')}
                             >
                                 {toast.message}
                             </div>

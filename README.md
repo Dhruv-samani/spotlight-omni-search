@@ -1,8 +1,25 @@
-# spotlight-omni-search 🔍 (v2.1.2)
+# spotlight-omni-search 🔍 (v2.3.0)
 
 A professional, **Tailwind-Native** Spotlight Search component for React and Next.js. Engineered to blend perfectly into your existing design system without shipping any global CSS resets or side effects.
 
-## 🆕 What's New in v2.1 (The Advanced Release)
+## 🆕 What's New in v2.3 (Simplified API)
+
+- **🎯 SpotlightProvider**: One-line setup - no manual state management
+- **🔘 SearchTrigger**: Pre-styled button component with 3 variants
+- **🪝 useGlobalSpotlight**: Simplified hook for programmatic control
+- **📦 Framework Exports**: `/react` and `/next` for optimized imports
+- **⚡ Auto Setup**: Cmd+K shortcut and CSS imports handled automatically
+- **🔄 Backward Compatible**: Existing code works unchanged
+
+**Result**: Setup reduced from **3+ files, 50+ lines** → **1 file, 5 lines**! 🎉
+
+## 🆕 What's New in v2.2 (Performance)
+
+- **🚀 Virtual Scrolling**: Handle 1000+ items smoothly with auto-enable at 500 items
+- **📊 Performance**: 10x faster rendering for large lists
+- **⌨️ Keyboard Nav**: Fully compatible with virtual scrolling
+
+## 🆕 What's New in v2.1 (Advanced Features)
 
 - **📡 Asynchronous Searching**: Built-in support for remote APIs with debouncing and result merging.
 - **⌨️ Command Arguments**: Execute actions with dynamic parameters (e.g., `Google hello world`).
@@ -39,11 +56,80 @@ npm install spotlight-omni-search lucide-react
 
 > **Note**: `lucide-react` is a peer dependency.
 
-## 🛠 Integration (Required)
+---
 
-Because v2 uses standard Tailwind classes, you **must** tell Tailwind to scan the library for styles.
+## 🚀 Quick Start (30 seconds)
 
-### 1. Update `tailwind.config.js`
+### New Simplified API (v2.3+) ⭐ RECOMMENDED
+
+**Next.js App Router**
+
+```tsx
+// app/layout.tsx
+"use client";
+import { SpotlightProvider, SearchTrigger } from "spotlight-omni-search/next";
+import { useRouter } from "next/navigation";
+
+export default function RootLayout({ children }) {
+  const router = useRouter();
+
+  const items = [
+    { id: "home", label: "Home", route: "/" },
+    { id: "about", label: "About", route: "/about" },
+  ];
+
+  return (
+    <html>
+      <body>
+        <SpotlightProvider
+          items={items}
+          onNavigate={(path) => router.push(path)}
+        >
+          <nav>
+            <SearchTrigger /> {/* ⌘K button - that's it! */}
+          </nav>
+          {children}
+        </SpotlightProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+**React / Vite**
+
+```tsx
+// App.tsx
+import { SpotlightProvider, SearchTrigger } from "spotlight-omni-search/react";
+
+function App() {
+  const items = [
+    { id: "home", label: "Home", route: "/" },
+    { id: "about", label: "About", route: "/about" },
+  ];
+
+  return (
+    <SpotlightProvider items={items}>
+      <nav>
+        <SearchTrigger /> {/* ⌘K button - that's it! */}
+      </nav>
+      {children}
+    </SpotlightProvider>
+  );
+}
+```
+
+**That's it!** Press `Cmd+K` (or `Ctrl+K`) to test. No additional setup needed! ✨
+
+---
+
+## 🛠 Manual Setup (Advanced Users)
+
+If you prefer more control or need the classic API:
+
+### Step 1: Configure Tailwind Content Paths
+
+Update your `tailwind.config.js` or `tailwind.config.ts`:
 
 ```javascript
 /** @type {import('tailwindcss').Config} */
@@ -53,10 +139,36 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
     "./node_modules/spotlight-omni-search/**/*.{js,ts,jsx,tsx}", // <--- ADD THIS
   ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
 };
 ```
 
-### 2. Import Default Variables
+### Step 2: Import Tailwind CSS
+
+**For Tailwind CSS v3 (Most Common)**
+
+In your main CSS file (e.g., `src/index.css` or `app/globals.css`):
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+**For Tailwind CSS v4 (Latest)**
+
+```css
+@import "tailwindcss";
+```
+
+> **Note**: If you're unsure which version you have, check your `package.json` for the `tailwindcss` version.
+
+### Step 3: Import Spotlight Variables
+
+In your main app file (e.g., `main.tsx`, `App.tsx`, or `layout.tsx`):
 
 ```tsx
 import "spotlight-omni-search/style.css";
@@ -177,6 +289,62 @@ Spotlight automatically **obfuscates** data stored in `localStorage` (like searc
 
 ---
 
+## 🎯 Simplified API Reference (v2.3+)
+
+### SpotlightProvider
+
+Wrapper component that handles all the complexity for you.
+
+```tsx
+<SpotlightProvider
+  items={items}                    // Required: Your search items
+  onNavigate={(path) => ...}       // Optional: Navigation handler
+  theme="dark"                     // Optional: Theme
+  layout="center"                  // Optional: Layout
+  shortcutKey="k"                  // Optional: Custom shortcut (default: 'k')
+  disableShortcut={false}          // Optional: Disable Cmd+K
+  // All other Spotlight props supported
+>
+  {children}
+</SpotlightProvider>
+```
+
+### SearchTrigger
+
+Pre-styled button component with 3 variants.
+
+```tsx
+<SearchTrigger
+  variant="default" // 'default' | 'minimal' | 'icon-only'
+  showShortcut={true} // Show ⌘K hint
+  className="..." // Custom classes
+/>
+```
+
+### useGlobalSpotlight
+
+Hook to programmatically control Spotlight.
+
+```tsx
+const { open, close, toggle, isOpen } = useGlobalSpotlight();
+
+<button onClick={open}>Custom Search Button</button>;
+```
+
+### Comparison: Simplified vs Classic API
+
+| Feature                 | Simplified API | Classic API |
+| ----------------------- | -------------- | ----------- |
+| **Setup Time**          | 30 seconds     | 10 minutes  |
+| **Files to Modify**     | 1 file         | 3+ files    |
+| **Lines of Code**       | ~5 lines       | ~50 lines   |
+| **Auto Cmd+K**          | ✅ Yes         | ❌ Manual   |
+| **Auto CSS Import**     | ✅ Yes         | ❌ Manual   |
+| **Event System**        | ✅ Built-in    | ❌ Manual   |
+| **Backward Compatible** | ✅ Yes         | ✅ Yes      |
+
+---
+
 ## 🚀 Advanced Features Quick Reference
 
 ### 1. Asynchronous Search
@@ -276,6 +444,64 @@ Choose from 7 different layout modes:
 
 ---
 
-## 📄 License
+## � Troubleshooting
+
+### Styles Not Appearing / Component Looks Unstyled
+
+**Problem**: The Spotlight component appears but has no styling or looks broken.
+
+**Solution**: This usually means Tailwind CSS is not configured correctly. Follow these steps:
+
+1. **Check Tailwind Content Path**: Make sure you've added the library to your `tailwind.config.js`:
+
+   ```javascript
+   content: ["./node_modules/spotlight-omni-search/**/*.{js,ts,jsx,tsx}"];
+   ```
+
+2. **Check Tailwind Directives**: Ensure your main CSS file includes Tailwind directives:
+
+   **For Tailwind v3**:
+
+   ```css
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   ```
+
+   **For Tailwind v4**:
+
+   ```css
+   @import "tailwindcss";
+   ```
+
+3. **Import Spotlight CSS**: Make sure you've imported the Spotlight variables:
+
+   ```tsx
+   import "spotlight-omni-search/style.css";
+   ```
+
+4. **Restart Dev Server**: After making config changes, restart your development server.
+
+### TypeScript Errors
+
+If you see TypeScript errors related to `lucide-react`, make sure it's installed:
+
+```bash
+npm install lucide-react
+```
+
+### Module Not Found Errors
+
+If you see errors like `Cannot find module 'spotlight-omni-search'`, try:
+
+```bash
+npm install
+# or
+rm -rf node_modules package-lock.json && npm install
+```
+
+---
+
+## �📄 License
 
 MIT © Dhruv

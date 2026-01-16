@@ -58,6 +58,63 @@ export interface SpotlightToast {
   duration?: number;
 }
 
+/**
+ * Custom class names for all Spotlight elements
+ * Allows complete styling control in headless mode
+ */
+export interface SpotlightClassNames {
+  /** Outer backdrop/overlay container */
+  backdrop?: string;
+  /** Inner modal/dialog container */
+  container?: string;
+  /** Search header wrapper */
+  header?: string;
+  /** Search icon */
+  searchIcon?: string;
+  /** Search input field */
+  input?: string;
+  /** Clear button (X icon) */
+  clearButton?: string;
+  /** Filters bar container */
+  filtersBar?: string;
+  /** Regex toggle button */
+  regexButton?: string;
+  /** Group filter button */
+  groupButton?: string;
+  /** Active group filter button */
+  groupButtonActive?: string;
+  /** Results list container */
+  listContainer?: string;
+  /** Loading state container */
+  loading?: string;
+  /** Empty state container */
+  empty?: string;
+  /** Group header */
+  groupHeader?: string;
+  /** Individual result item */
+  item?: string;
+  /** Selected/active result item */
+  itemSelected?: string;
+  /** Item icon container */
+  itemIcon?: string;
+  /** Item label/title */
+  itemLabel?: string;
+  /** Item description */
+  itemDescription?: string;
+  /** Item keyboard shortcut badge */
+  itemShortcut?: string;
+  /** Footer container */
+  footer?: string;
+  /** Confirmation modal overlay */
+  confirmationOverlay?: string;
+  /** Confirmation modal container */
+  confirmationContainer?: string;
+  /** Toast notification container */
+  toastContainer?: string;
+  /** Individual toast */
+  toast?: string;
+}
+
 export interface SpotlightProps {
   isOpen: boolean;
   onClose: () => void;
@@ -151,6 +208,39 @@ export interface SpotlightProps {
    * @default false
    */
   enableGoogleSearch?: boolean;
+  
+  /**
+   * Enable headless mode - removes default styling, allowing full custom styling via classNames
+   * @default false
+   */
+  headless?: boolean;
+  
+  /**
+   * Custom class names for all component elements
+   * In headless mode, these replace default classes. In normal mode, they merge with defaults.
+   */
+  classNames?: SpotlightClassNames;
+  
+  /**
+   * Enable virtual scrolling for large lists
+   * - true: Always use virtual scrolling
+   * - false: Never use virtual scrolling
+   * - 'auto': Auto-enable when items exceed threshold (default)
+   * @default 'auto'
+   */
+  enableVirtualScrolling?: boolean | 'auto';
+  
+  /**
+   * Threshold for auto-enabling virtual scrolling
+   * @default 500
+   */
+  virtualScrollThreshold?: number;
+  
+  /**
+   * Number of items to render outside visible area for smoother scrolling
+   * @default 5
+   */
+  virtualScrollOverscan?: number;
 }
 
 export type SpotlightLayout =

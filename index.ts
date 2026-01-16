@@ -11,6 +11,14 @@ export { useMediaQuery } from './hooks/useMediaQuery';
 export { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 export { useTouchGestures } from './hooks/useTouchGestures';
 
+// Simplified API (v2.3+)
+export { SpotlightProvider } from './providers/SpotlightProvider';
+export type { SpotlightProviderProps } from './providers/SpotlightProvider';
+export { SearchTrigger } from './components/SearchTrigger';
+export type { SearchTriggerProps } from './components/SearchTrigger';
+export { useGlobalSpotlight } from './hooks/useGlobalSpotlight';
+
+
 // Types
 export type { SpotlightProps, SpotlightItem, SpotlightItemType, KeyboardShortcuts } from './types';
 
