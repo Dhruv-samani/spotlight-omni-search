@@ -1,3 +1,124 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --playground-bg: #f8fafc;
+    --playground-card: #ffffff;
+    --playground-border: #e2e8f0;
+    --playground-text: #0f172a;
+    --playground-accent: #3b82f6;
+}
+
+.dark {
+    --playground-bg: #0f172a;
+    --playground-card: #1e293b;
+    --playground-border: #334155;
+    --playground-text: #f8fafc;
+    --playground-accent: #60a5fa;
+}
+
+body {
+    background-color: var(--playground-bg);
+    color: var(--playground-text);
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+.dark .glass-card {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.swatch {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 4px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.swatch:hover {
+    transform: scale(1.15) rotate(5deg);
+}
+
+.swatch.active {
+    border-color: var(--playground-accent);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.layout-option {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.layout-option:hover {
+    background: rgba(59, 130, 246, 0.08);
+    transform: translateY(-2px);
+}
+
+.layout-option.active {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: var(--playground-accent);
+}
+
+@keyframes gradient-move {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.gradient-text {
+    background: linear-gradient(-45deg, #3b82f6, #8b5cf6, #ec4899);
+    background-size: 200% 200%;
+    animation: gradient-move 5s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--playground-border);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--playground-accent);
+}
+
+pre {
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+}

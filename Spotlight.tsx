@@ -14,6 +14,23 @@ import { themes } from './themes';
 import { usePluginManager } from './hooks/usePluginManager';
 import { useDebounce } from './hooks/useDebounce';
 
+function useScrollLock(lock: boolean) {
+    useEffect(() => {
+        if (!lock) return;
+
+        const originalBodyStyle = document.body.style.overflow;
+        const originalHtmlStyle = document.documentElement.style.overflow;
+
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        return () => {
+            document.body.style.overflow = originalBodyStyle;
+            document.documentElement.style.overflow = originalHtmlStyle;
+        };
+    }, [lock]);
+}
+
 export function Spotlight({
     isOpen,
     onClose,
@@ -101,6 +118,9 @@ export function Spotlight({
         enabled: enableRecent,
         maxItems: maxRecentItems,
     });
+
+    // Scroll Lock
+    useScrollLock(isOpen);
 
     // Search history tracking
     const { addToHistory, getSuggestions } = useSearchHistory({
@@ -674,7 +694,7 @@ export function Spotlight({
 
                 {/* Filters & Regex Toggle */}
                 {items.length > 0 && (
-                    <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20 overflow-x-auto no-scrollbar scroll-fade">
                         {/* Regex Toggle */}
                         <button
                             onClick={() => setRegexMode(!regexMode)}

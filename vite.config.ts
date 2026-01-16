@@ -17,12 +17,13 @@ export default defineConfig(({ command }) => ({
       formats: ["es", "umd"],
     },
     rollupOptions: {
-      external: ["react", "react-dom", "lucide-react"],
+      external: ["react", "react-dom", "lucide-react", "react/jsx-runtime"],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
           "lucide-react": "LucideReact",
+          "react/jsx-runtime": "jsxRuntime",
         },
       },
     },

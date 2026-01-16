@@ -1,6 +1,6 @@
 {
   "name": "spotlight-omni-search",
-  "version": "2.1.1",
+  "version": "2.1.3",
   "type": "module",
   "description": "Universal Command Palette & Global Search for React",
   "main": "./dist/index.umd.js",
@@ -16,7 +16,8 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.umd.js"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/spotlight-omni-search.css",
+    "./spotlight-omni-search.css": "./dist/spotlight-omni-search.css"
   },
   "keywords": [
     "react",

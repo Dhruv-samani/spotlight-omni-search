@@ -1,8 +1,8 @@
-# spotlight-omni-search 🔍 (v2.1.0)
+# spotlight-omni-search 🔍 (v2.1.2)
 
 A professional, **Tailwind-Native** Spotlight Search component for React and Next.js. Engineered to blend perfectly into your existing design system without shipping any global CSS resets or side effects.
 
-## 🆕 What's New in v2.0 (The Advanced Release)
+## 🆕 What's New in v2.1 (The Advanced Release)
 
 - **📡 Asynchronous Searching**: Built-in support for remote APIs with debouncing and result merging.
 - **⌨️ Command Arguments**: Execute actions with dynamic parameters (e.g., `Google hello world`).
@@ -59,7 +59,9 @@ export default {
 ### 2. Import Default Variables
 
 ```tsx
-import "spotlight-omni-search/dist/style.css";
+import "spotlight-omni-search/style.css";
+// or
+import "spotlight-omni-search/spotlight-omni-search.css";
 ```
 
 ---
