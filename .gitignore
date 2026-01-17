@@ -42,5 +42,17 @@ logs
 *.log
 
 # Temporary files
-.tmp
-.temp
+
+# Storybook
+/storybook-static
+/.gemini
+
+# Misc
+.DS_Store
+*.pem
+
+# Local Env Files
+.env
+.env.local
+.env.*.local
+

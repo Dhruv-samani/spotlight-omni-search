@@ -4,6 +4,8 @@ export default {
     "./Spotlight.tsx",
     "./adapters/**/*.{ts,tsx}",
     "./lib/**/*.{ts,tsx}",
+    "./stories/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
