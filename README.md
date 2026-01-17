@@ -1,4 +1,4 @@
-# spotlight-omni-search 🔍 (v2.3.0)
+# spotlight-omni-search 🔍 (v2.3.1)
 
 A professional, **Tailwind-Native** Spotlight Search component for React and Next.js. Engineered to blend perfectly into your existing design system without shipping any global CSS resets or side effects.
 
@@ -33,6 +33,90 @@ A professional, **Tailwind-Native** Spotlight Search component for React and Nex
 - **📱 Responsive & Touch**: Mobile-optimized with touch gestures (swipe-to-close).
 - **🔌 Plugin Architecture**: Build and inject custom middleware, custom search sources, and lifecycle hooks.
 - **🔒 Privacy Mode**: Automatic Base64 obfuscation for all `localStorage` data (History, Recents, Analytics).
+
+---
+
+## 📊 Before & After Comparison
+
+### ❌ Before (Classic API) - 3 Files, 50+ Lines
+
+**Step 1**: Configure Tailwind (`tailwind.config.js`)
+
+```javascript
+content: ["./node_modules/spotlight-omni-search/**/*.{js,ts,jsx,tsx}"];
+```
+
+**Step 2**: Import CSS (`main.tsx` or `App.tsx`)
+
+```tsx
+import "spotlight-omni-search/style.css";
+```
+
+**Step 3**: Setup state and keyboard shortcuts (`App.tsx`)
+
+```tsx
+import { useState, useEffect } from "react";
+import { Spotlight, useSpotlight } from "spotlight-omni-search";
+
+function App() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Manual keyboard shortcut setup
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  return (
+    <>
+      <button onClick={() => setIsOpen(true)}>Search</button>
+      <Spotlight
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        items={items}
+        onNavigate={(path) => router.push(path)}
+      />
+    </>
+  );
+}
+```
+
+**Total**: 3 files modified, ~50 lines of code
+
+---
+
+### ✅ After (Simplified API v2.3+) - 1 File, 5 Lines
+
+```tsx
+// App.tsx or layout.tsx
+import { SpotlightProvider, SearchTrigger } from "spotlight-omni-search/react";
+
+function App() {
+  return (
+    <SpotlightProvider items={items} onNavigate={(path) => router.push(path)}>
+      <SearchTrigger /> {/* That's it! ⌘K works automatically */}
+      {children}
+    </SpotlightProvider>
+  );
+}
+```
+
+**Total**: 1 file, ~5 lines of code ✨
+
+**Improvements**:
+
+- ✅ No manual state management
+- ✅ No manual keyboard shortcut setup
+- ✅ No CSS import needed (auto-imported)
+- ✅ No Tailwind config needed (handled internally)
+- ✅ Pre-styled trigger button included
+- ✅ **90% less code to write**
 
 ---
 
@@ -120,6 +204,12 @@ function App() {
 ```
 
 **That's it!** Press `Cmd+K` (or `Ctrl+K`) to test. No additional setup needed! ✨
+
+### 📚 Need More Help?
+
+- **[Framework-Specific Guides](./docs/FRAMEWORK_GUIDES.md)** - Detailed setup for Next.js, Vite, CRA
+- **[Migration Guide](./docs/MIGRATION.md)** - Upgrade from classic API to simplified API
+- **[API Reference](#️-api-reference)** - Full props documentation below
 
 ---
 
@@ -499,6 +589,157 @@ npm install
 # or
 rm -rf node_modules package-lock.json && npm install
 ```
+
+---
+
+## 🔧 Troubleshooting (Simplified API)
+
+### SearchTrigger Not Appearing
+
+**Problem**: The `SearchTrigger` button doesn't render.
+
+**Solutions**:
+
+1. Ensure you're inside `<SpotlightProvider>`:
+
+   ```tsx
+   <SpotlightProvider items={items}>
+     <SearchTrigger /> {/* Must be inside provider */}
+   </SpotlightProvider>
+   ```
+
+2. Check for console errors
+3. Verify `lucide-react` is installed: `npm install lucide-react`
+
+---
+
+### Keyboard Shortcut Not Working
+
+**Problem**: Cmd+K / Ctrl+K doesn't open Spotlight.
+
+**Solutions**:
+
+1. **Check if another app is using the shortcut**:
+
+   - Chrome DevTools uses Cmd+K
+   - Some extensions override it
+   - Try a custom shortcut: `<SpotlightProvider shortcutKey="p">`
+
+2. **Verify shortcut isn't disabled**:
+
+   ```tsx
+   <SpotlightProvider disableShortcut={false}> {/* Should be false or omitted */}
+   ```
+
+3. **Check browser console** for JavaScript errors
+
+---
+
+### useGlobalSpotlight Hook Error
+
+**Problem**: Error: "useSpotlightContext must be used within SpotlightProvider"
+
+**Solution**: Wrap your component tree with `SpotlightProvider`:
+
+```tsx
+// ❌ Wrong
+function App() {
+  const { open } = useGlobalSpotlight(); // Error!
+  return <div>...</div>;
+}
+
+// ✅ Correct
+function CustomButton() {
+  const { open } = useGlobalSpotlight(); // Works!
+  return <button onClick={open}>Search</button>;
+}
+
+function App() {
+  return (
+    <SpotlightProvider items={items}>
+      <CustomButton />
+    </SpotlightProvider>
+  );
+}
+```
+
+---
+
+### TypeScript Errors with Imports
+
+**Problem**: Cannot find module 'spotlight-omni-search/react'
+
+**Solutions**:
+
+1. **Check package.json exports** are supported (Node 12+, TypeScript 4.7+)
+2. **Update TypeScript**: `npm install typescript@latest`
+3. **Use main import** if exports don't work:
+   ```tsx
+   import { SpotlightProvider } from "spotlight-omni-search";
+   ```
+
+---
+
+### Styles Look Different Than Expected
+
+**Problem**: SearchTrigger button doesn't match screenshots.
+
+**Solutions**:
+
+1. **Ensure Tailwind is configured** (see Manual Setup section)
+2. **Check for CSS conflicts** with your global styles
+3. **Use custom className**:
+   ```tsx
+   <SearchTrigger className="your-custom-classes" />
+   ```
+
+---
+
+### Next.js "use client" Error
+
+**Problem**: Error in Next.js App Router about Server Components.
+
+**Solution**: Add `"use client"` directive:
+
+```tsx
+// app/layout.tsx
+"use client"; // Add this at the top
+
+import { SpotlightProvider } from "spotlight-omni-search/next";
+```
+
+---
+
+### Navigation Not Working
+
+**Problem**: Selecting items doesn't navigate.
+
+**Solutions**:
+
+1. **Provide onNavigate callback**:
+
+   ```tsx
+   <SpotlightProvider
+     items={items}
+     onNavigate={(path) => router.push(path)} // Required!
+   />
+   ```
+
+2. **Check items have route property**:
+   ```tsx
+   const items = [
+     { id: "1", label: "Home", route: "/" }, // Must have route
+   ];
+   ```
+
+---
+
+## 📚 Additional Resources
+
+- **[TypeScript Types](./docs/TYPESCRIPT.md)** - Complete type reference
+- **[Framework Guides](./docs/FRAMEWORK_GUIDES.md)** - Setup for Next.js, Vite, CRA
+- **[Migration Guide](./docs/MIGRATION.md)** - Upgrade from classic API
+- **[Examples](./dev/test-simplified.tsx)** - Working code examples
 
 ---
 
