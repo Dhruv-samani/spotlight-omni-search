@@ -4,6 +4,7 @@ import { Spotlight } from '../Spotlight';
 import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
 import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
+import { CalculatorPlugin } from '../plugins/calculator';
 import '../dev/index.css'; // Import Playground specific styles
 // Note: library index.css is imported globally in preview.ts or inside SpotlightProvider, 
 // but dev/main.tsx imported it explicitly. Spotlight component usually expects it.
@@ -110,6 +111,11 @@ const Playground = () => {
     const activeItems = useLargeDataset ? largeDataset : items;
 
     const plugins = useMemo(() => [
+        CalculatorPlugin({
+            enableClipboardCopy: true,
+            precision: 10,
+            icon: <Code size={16} className="text-blue-500" /> // Using Lucide icon
+        }),
         AnalyticsPlugin({
             // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
             // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
@@ -164,7 +170,7 @@ const Playground = () => {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">Spotlight <span className="gradient-text">Playground</span></h1>
-                            <p className="text-xs opacity-50 font-mono">v2.1.4 Production v.11</p>
+                            <p className="text-xs opacity-50 font-mono">v2.4.0 with Calculator</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -286,6 +292,10 @@ const Playground = () => {
                         <div className="glass-card p-8 bg-blue-600/5 border-blue-500/20">
                             <h3 className="text-sm font-semibold opacity-70 mb-4 uppercase tracking-wider">Quick Highlights</h3>
                             <ul className="space-y-4">
+                                <li className="flex items-center gap-3 text-sm">
+                                    <Code size={16} className="text-blue-500" />
+                                    <span>Built-in Calculator (Try: 2 + 2)</span>
+                                </li>
                                 <li className="flex items-center gap-3 text-sm">
                                     <Shield size={16} className="text-emerald-500" />
                                     <span>Privacy Obfuscation Enabled</span>

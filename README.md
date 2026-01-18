@@ -1,4 +1,4 @@
-# spotlight-omni-search 🔍 (v2.3.2)
+# spotlight-omni-search 🔍 (v2.4.0)
 
 🔗 **[Live Demo & Documentation](https://spotlight-omni-search-docs.netlify.app/)**
 
@@ -10,21 +10,23 @@ A professional, **Tailwind-Native** Spotlight Search component for React and Nex
 
 - **🎯 Simple Setup**: One-line integration with `SpotlightProvider`.
 - **🔘 Pre-styled Components**: Includes a beautiful `SearchTrigger` button.
+- **🧮 Built-in Calculator**: Type `2 + 2` and get instant results!
 - **⚡ Performance**: Virtual scrolling for 1000+ items and instant search.
 - **🎨 Theming**: 20+ pre-built themes (Dark, Light, Slate, Blue, etc.).
 - **🛠️ Advanced**: Async search, command arguments, and undo/redo support.
 - **🔒 Privacy**: Built-in data obfuscation for history and recent items.
 - **⌨️ Accessibility**: Full keyboard navigation (`Cmd+K`, Arrow keys).
+- **🎭 Icon Flexibility**: Use any icon library (Lucide, Material, Heroicons) or custom SVGs.
 
 ---
 
 ## 📦 Installation
 
 ```bash
-npm install spotlight-omni-search lucide-react
+npm install spotlight-omni-search
 ```
 
-> **Note**: `lucide-react` is a required peer dependency for icons.
+> **Note**: Icons are optional! Use any icon library you prefer (Lucide, Material Icons, Heroicons, custom SVGs, or no icons). See [Icon Guide](docs/ICONS.md) for examples.
 
 ---
 
@@ -144,6 +146,38 @@ Create powerful commands that accept user input (e.g., "Google [query]").
   action: (query) => window.open(`https://google.com/search?q=${query}`)
 }
 ```
+
+### Built-in Calculator Plugin 🧮
+
+Evaluate math expressions directly in the search bar!
+
+```tsx
+import { SpotlightProvider } from "spotlight-omni-search/next";
+import { CalculatorPlugin } from "spotlight-omni-search";
+
+<SpotlightProvider
+  items={items}
+  plugins={[
+    CalculatorPlugin({
+      enableClipboardCopy: true, // Auto-copy result to clipboard
+      precision: 10, // Decimal precision
+      icon: <YourIconComponent /> // Optional: any icon library
+    })
+  ]}
+  onNavigate={navigate}
+>
+```
+
+**Try it:**
+
+- Type `2 + 2` → Get `4`
+- Type `(10 + 5) * 2` → Get `30`
+- Type `2 ^ 8` → Get `256`
+- Press Enter to copy result to clipboard!
+
+**Supported operators:** `+`, `-`, `*`, `/`, `%`, `^` (exponentiation)
+
+**Security:** Safe evaluation - blocks dangerous code like `alert()`, `window`, etc.
 
 ---
 

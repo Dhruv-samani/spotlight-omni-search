@@ -980,24 +980,42 @@ export function Spotlight({
 
                 {/* Footer */}
                 {renderFooter ? renderFooter() : (
-                    <div className={mergeClasses("h-10 border-t border-border bg-muted/30 px-4 flex items-center justify-between text-[10px] text-muted-foreground", 'footer')}>
-                        <div className="flex gap-2">
-                            <span>Use arrow keys to navigate</span>
-                            <span>Enter to select</span>
+                    <div className={mergeClasses("border-t border-border bg-muted/30 px-4 py-2.5 flex items-center justify-between text-[10px] text-muted-foreground", 'footer')}>
+                        <div className="flex gap-4 items-center">
+                            <div className="flex items-center gap-1.5">
+                                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">↑↓</kbd>
+                                <span>Navigate</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">↵</kbd>
+                                <span>Select</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">Esc</kbd>
+                                <span>Close</span>
+                            </div>
+                            {enableVimNavigation && (
+                                <div className="flex items-center gap-1.5 text-primary/70">
+                                    <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">j/k</kbd>
+                                    <span>Vim</span>
+                                </div>
+                            )}
                         </div>
-                        {isAsyncLoading && (
-                            <div className="flex items-center gap-1.5 text-primary animate-pulse">
-                                <div className="w-1.5 h-1.5 rounded-full bg-current" />
-                                <span>Searching remote...</span>
-                            </div>
-                        )}
-                        {debug && (
-                            <div className="flex items-center gap-2">
-                                <span>Latency: {searchTimeRef.current.toFixed(2)}ms</span>
-                                <span>Results: {filteredItems.length}</span>
-                                <span title="Total Render Count">Renders: {renderCount.current}</span>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                            {isAsyncLoading && (
+                                <div className="flex items-center gap-1.5 text-primary animate-pulse">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                                    <span>Searching...</span>
+                                </div>
+                            )}
+                            {debug && (
+                                <div className="flex items-center gap-2 font-mono">
+                                    <span>{searchTimeRef.current.toFixed(2)}ms</span>
+                                    <span>•</span>
+                                    <span>{filteredItems.length} results</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 

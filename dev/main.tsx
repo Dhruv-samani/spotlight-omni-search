@@ -7,6 +7,7 @@ import { Spotlight } from '../Spotlight';
 import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
 import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
+import { CalculatorPlugin } from '../plugins/calculator';
 import {
     Layout,
     Palette,
@@ -101,6 +102,11 @@ function App() {
     const activeItems = useLargeDataset ? largeDataset : items;
 
     const plugins = useMemo(() => [
+        CalculatorPlugin({
+            enableClipboardCopy: true,
+            precision: 10,
+            icon: <Code size={16} /> // Using Lucide icon, but could be any icon library
+        }),
         AnalyticsPlugin({
             // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
             // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)

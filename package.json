@@ -1,8 +1,8 @@
 {
   "name": "spotlight-omni-search",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "type": "module",
-  "description": "Universal Command Palette & Global Search for React",
+  "description": "Universal Command Palette & Global Search for React with Built-in Calculator",
   "main": "./dist/index.umd.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -56,9 +56,13 @@
     "build-storybook": "storybook build"
   },
   "peerDependencies": {
-    "lucide-react": ">=0.400.0",
     "react": ">=18",
     "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "lucide-react": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.10.8",

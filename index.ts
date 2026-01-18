@@ -26,6 +26,10 @@ export type { SpotlightProps, SpotlightItem, SpotlightItemType, KeyboardShortcut
 export { fuzzyFilter, fuzzyFilterItems, fuzzyMatch, type ScoredItem, type FuzzyMatchResult } from './lib/fuzzySearch';
 export { highlightMatches, highlightQuery } from './lib/searchHighlight';
 
+// Plugins
+export { CalculatorPlugin, type CalculatorOptions } from './plugins/calculator';
+export { AnalyticsPlugin, type AnalyticsOptions } from './plugins/analytics';
+
 // Existing exports not explicitly modified but still needed
 export * from "./adapters/routes";
 export * from "./actions/commonActions";
