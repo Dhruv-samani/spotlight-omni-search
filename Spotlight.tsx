@@ -109,6 +109,8 @@ export function Spotlight({
 
     const debouncedQuery = useDebounce(query, debounceTime);
     const searchTimeRef = useRef<number>(0);
+    const renderCount = useRef(0);
+    renderCount.current++;
 
     // Event Logging Utility
     const logEvent = useCallback((event: string, data?: any) => {
@@ -993,6 +995,7 @@ export function Spotlight({
                             <div className="flex items-center gap-2">
                                 <span>Latency: {searchTimeRef.current.toFixed(2)}ms</span>
                                 <span>Results: {filteredItems.length}</span>
+                                <span title="Total Render Count">Renders: {renderCount.current}</span>
                             </div>
                         )}
                     </div>

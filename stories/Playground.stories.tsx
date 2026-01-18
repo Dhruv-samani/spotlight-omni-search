@@ -3,6 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Spotlight } from '../Spotlight';
 import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
+import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
 import '../dev/index.css'; // Import Playground specific styles
 // Note: library index.css is imported globally in preview.ts or inside SpotlightProvider, 
 // but dev/main.tsx imported it explicitly. Spotlight component usually expects it.
@@ -54,7 +55,7 @@ const Playground = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState<string>('dark');
     const [layout, setLayout] = useState<SpotlightLayout>('center');
-    const [debug, setDebug] = useState(true);
+    const [debug, setDebug] = useState(false);
     const [enableGoogle, setEnableGoogle] = useState(true);
     const [enableVim, setEnableVim] = useState(false);
     const [enableRecent, setEnableRecent] = useState(true);
@@ -110,8 +111,13 @@ const Playground = () => {
 
     const plugins = useMemo(() => [
         AnalyticsPlugin({
-            onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
-            onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
+            // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
+            // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
+        }),
+        GoogleAnalyticsPlugin({
+            measurementId: 'G-JQXKL5EW07',
+            enableDebug: false,
+            loadScript: true,
         })
     ], []);
 

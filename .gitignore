@@ -1,58 +1,59 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
+# Testing
 /coverage
 
-# production
+# Production
 /build
 /dist
 
-# misc
-.DS_Store
+# Environment Variables & Secrets (CRITICAL)
+.env
 .env.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
+*.pem
+*.key
+*.cert
+*.pfx
+*.p12
+id_rsa
+id_rsa.pub
+secrets.js
+secrets.json
+.npmrc
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# IDE
+# IDE & Editor
 .vscode
 .idea
 *.swp
 *.swo
 *~
+*.sublime-workspace
 
-# OS
-Thumbs.db
+# OS Files
 .DS_Store
-
-# TypeScript
-*.tsbuildinfo
+Thumbs.db
+desktop.ini
 
 # Logs
 logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Temporary files
+# TypeScript
+*.tsbuildinfo
 
 # Storybook
 /storybook-static
+
+# Agentic & Temporary
 /.gemini
-
-# Misc
-.DS_Store
-*.pem
-
-# Local Env Files
-.env
-.env.local
-.env.*.local
-
+.agent/

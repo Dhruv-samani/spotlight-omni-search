@@ -1,3 +1,4 @@
+/// <reference path="../vite-env.d.ts" />
 import React, { useState, useMemo, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -5,6 +6,7 @@ import '../index.css'; // Library CSS variables
 import { Spotlight } from '../Spotlight';
 import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
+import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
 import {
     Layout,
     Palette,
@@ -44,7 +46,7 @@ function App() {
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState<string>('dark');
     const [layout, setLayout] = useState<SpotlightLayout>('center');
-    const [debug, setDebug] = useState(true);
+    const [debug, setDebug] = useState(false);
     const [enableGoogle, setEnableGoogle] = useState(true);
     const [enableVim, setEnableVim] = useState(false);
     const [enableRecent, setEnableRecent] = useState(true);
@@ -100,8 +102,13 @@ function App() {
 
     const plugins = useMemo(() => [
         AnalyticsPlugin({
-            onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
-            onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
+            // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
+            // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
+        }),
+        GoogleAnalyticsPlugin({
+            measurementId: import.meta.env.VITE_GA_MEASUREMENT_ID || '',
+            enableDebug: false,
+            loadScript: !!import.meta.env.VITE_GA_MEASUREMENT_ID,
         })
     ], []);
 
