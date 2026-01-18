@@ -67,8 +67,17 @@ const Playground = () => {
         { id: '2', label: 'Analytics', type: 'page', group: 'Navigation' },
         { id: '3', label: 'User Settings', type: 'page', group: 'System' },
         { id: '4', label: 'Billing & Plans', type: 'page', group: 'System' },
-        { id: '5', label: 'Switch to Light Mode', type: 'action', group: 'Quick Actions', action: () => setTheme('light') },
-        { id: '6', label: 'Google Recent News', type: 'action', group: 'External', action: (args?: string) => window.open(`https://google.com/search?q=${args}`) },
+
+        // Theme Actions
+        { id: 'theme-light', label: 'Switch to Light Mode', type: 'action', group: 'Theme', action: () => setTheme('light') },
+        { id: 'theme-dark', label: 'Switch to Dark Mode', type: 'action', group: 'Theme', action: () => setTheme('dark') },
+        { id: 'theme-slate', label: 'Switch to Slate Theme', type: 'action', group: 'Theme', action: () => setTheme('slate') },
+        { id: 'theme-rose', label: 'Switch to Rose Theme', type: 'action', group: 'Theme', action: () => setTheme('rose') },
+        { id: 'theme-violet', label: 'Switch to Violet Theme', type: 'action', group: 'Theme', action: () => setTheme('violet') },
+        { id: 'theme-amber', label: 'Switch to Amber Theme', type: 'action', group: 'Theme', action: () => setTheme('amber') },
+        { id: 'theme-midnight', label: 'Switch to Midnight Theme', type: 'action', group: 'Theme', action: () => setTheme('midnight') },
+
+        { id: '6', label: 'Google Recent News', type: 'action', group: 'External', action: (args?: string) => window.open(`https://google.com/search?q=\${args}`) },
         {
             id: '7',
             label: 'Delete User Profile',
