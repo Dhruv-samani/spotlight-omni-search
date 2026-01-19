@@ -1,0 +1,95 @@
+import { Meta, Story, Canvas, Source } from "@storybook/blocks";
+import * as SpotlightStories from "./Spotlight.stories";
+
+<Meta of={SpotlightStories} />
+
+# Spotlight Omni Search
+
+A professional, **Tailwind-Native** Spotlight Search component for React and Next.js.
+
+## 🚀 Quick Start
+
+Select your framework to see the setup code.
+
+<div className="subheading">Next.js App Router</div>
+
+<Source code={`
+// app/layout.tsx
+"use client";
+import { SpotlightProvider, SearchTrigger } from "spotlight-omni-search/next";
+import { useRouter } from "next/navigation";
+
+export default function RootLayout({ children }) {
+  const router = useRouter();
+
+const items = [
+{ id: "home", label: "Home", route: "/" },
+{ id: "docs", label: "Documentation", route: "/docs" },
+];
+
+return (
+
+<html lang="en">
+<body>
+<SpotlightProvider
+items={items}
+onNavigate={(path) => router.push(path)} >
+<SearchTrigger />
+{children}
+</SpotlightProvider>
+</body>
+</html>
+);
+}
+`} language="tsx" />
+
+<div className="subheading">Vite / React</div>
+
+<Source code={`
+import { SpotlightProvider, SearchTrigger } from "spotlight-omni-search/react";
+import { useNavigate } from "react-router-dom";
+
+function App() {
+const navigate = useNavigate();
+const items = [{ id: "dashboard", label: "Dashboard", route: "/dashboard" }];
+
+return (
+
+<SpotlightProvider items={items} onNavigate={navigate}>
+<div className="p-4">
+<SearchTrigger />
+</div>
+</SpotlightProvider>
+);
+}
+`} language="tsx" />
+
+## 🎨 Live Demo
+
+Click the button below to open the Spotlight component.
+
+<Canvas of={SpotlightStories.Default} />
+
+## 💅 Custom Styling
+
+You can granularly style every part of the component using \`classNames\` or specific props like \`headerClassName\`.
+
+<Canvas of={SpotlightStories.CustomStyled} />
+
+<Source
+  code={`
+<SpotlightProvider
+  items={items}
+  // Simplified Styling
+  className="shadow-xl border-blue-100" // Main container
+  headerClassName="bg-blue-50 border-b-2 border-blue-200"
+  itemClassName="hover:bg-blue-50" // All items
+  
+  // Advanced Granular Overrides
+  classNames={{
+    itemSelected: "bg-blue-100 text-blue-900 border-l-4 border-blue-500",
+  }}
+>
+`}
+  language="tsx"
+/>

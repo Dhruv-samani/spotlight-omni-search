@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, ReactNode } from 'react';
+import { useRef, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { SpotlightItem } from '../types';
 import { ScoredItem } from '../lib/fuzzySearch';
 import { SpotlightPlugin, PluginContext } from '../types/plugin';
@@ -72,7 +72,7 @@ export function usePluginManager({
     // but we use a ref set to prevent double init. 
     // Ideally onInit should only run once on mount.
 
-    const runOnBeforeSearch = (currentQuery: string, items: SpotlightItem[]): SpotlightItem[] => {
+    const runOnBeforeSearch = useCallback((currentQuery: string, items: SpotlightItem[]): SpotlightItem[] => {
         return plugins.reduce((accItems, plugin) => {
             if (plugin.onBeforeSearch) {
                 try {
@@ -83,9 +83,9 @@ export function usePluginManager({
             }
             return accItems;
         }, items);
-    };
+    }, [plugins]);
 
-    const runOnAfterSearch = (results: ScoredItem[]): ScoredItem[] => {
+    const runOnAfterSearch = useCallback((results: ScoredItem[]): ScoredItem[] => {
         return plugins.reduce((accResults, plugin) => {
             if (plugin.onAfterSearch) {
                 try {
@@ -96,9 +96,9 @@ export function usePluginManager({
             }
             return accResults;
         }, results);
-    };
+    }, [plugins]);
 
-    const runOnSelect = (item: SpotlightItem): boolean => {
+    const runOnSelect = useCallback((item: SpotlightItem): boolean => {
         // Return false if ANY plugin returns false (prevent default)
         for (const plugin of plugins) {
             if (plugin.onSelect) {
@@ -109,9 +109,9 @@ export function usePluginManager({
             }
         }
         return true;
-    };
+    }, [plugins]);
 
-    const runRenderHeader = (): ReactNode | null => {
+    const runRenderHeader = useCallback((): ReactNode | null => {
         for (const plugin of plugins) {
             if (plugin.renderHeader) {
                 try {
@@ -123,9 +123,9 @@ export function usePluginManager({
             }
         }
         return null;
-    };
+    }, [plugins]);
 
-    const runRenderBeforeList = (): ReactNode | null => {
+    const runRenderBeforeList = useCallback((): ReactNode | null => {
         for (const plugin of plugins) {
             if (plugin.renderBeforeList) {
                 try {
@@ -137,9 +137,9 @@ export function usePluginManager({
             }
         }
         return null;
-    };
+    }, [plugins]);
 
-    const runRenderAfterList = (): ReactNode | null => {
+    const runRenderAfterList = useCallback((): ReactNode | null => {
         for (const plugin of plugins) {
             if (plugin.renderAfterList) {
                 try {
@@ -151,14 +151,14 @@ export function usePluginManager({
             }
         }
         return null;
-    };
+    }, [plugins]);
 
-    return {
+    return useMemo(() => ({
         runOnBeforeSearch,
         runOnAfterSearch,
         runOnSelect,
         runRenderHeader,
         runRenderBeforeList,
         runRenderAfterList
-    };
+    }), [runOnBeforeSearch, runOnAfterSearch, runOnSelect, runRenderHeader, runRenderBeforeList, runRenderAfterList]);
 }

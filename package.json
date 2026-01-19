@@ -1,6 +1,6 @@
 {
   "name": "spotlight-omni-search",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "type": "module",
   "description": "Universal Command Palette & Global Search for React with Built-in Calculator",
   "main": "./dist/index.umd.js",
@@ -41,7 +41,12 @@
     "nextjs",
     "typescript",
     "fuzzy-search",
-    "keyboard-navigation"
+    "keyboard-navigation",
+    "calculator",
+    "math",
+    "calculation",
+    "expression-evaluator",
+    "utility"
   ],
   "author": "Dhruv",
   "license": "MIT",

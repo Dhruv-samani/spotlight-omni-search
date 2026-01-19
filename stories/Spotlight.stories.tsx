@@ -6,7 +6,7 @@ import React from 'react';
 
 // Layout container to make Spotlight visible
 const Container = ({ children }: { children: React.ReactNode }) => (
-    <div className="h-[400px] w-full flex flex-col items-center justify-center bg-gray-100 p-8">
+    <div className="h-[600px] w-full flex flex-col items-center justify-center bg-gray-100 p-8 relative">
         {children}
     </div>
 );
@@ -38,7 +38,12 @@ const meta = {
     },
     args: {
         onNavigate: () => { },
-    }
+        // Ensure overlay stays within the container for docs
+        classNames: {
+            backdrop: 'absolute inset-0 z-50',
+        },
+    },
+    tags: ['autodocs'],
 } satisfies Meta<typeof SpotlightProvider>;
 
 export default meta;
@@ -104,3 +109,28 @@ function CustomButton() {
         </button>
     );
 }
+
+export const CustomStyled: Story = {
+    args: {
+        items: items,
+        children: (
+            <div className="text-center">
+                <h1 className="text-2xl font-bold mb-4 text-blue-900">Custom Styled Spotlight</h1>
+                <p className="mb-4 text-blue-600">Press Cmd+K to open</p>
+                <div className="flex gap-4 justify-center">
+                    <SearchTrigger className="bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300" />
+                </div>
+            </div>
+        ),
+        // Simplified API
+        className: "shadow-xl border-blue-100",
+        headerClassName: "bg-blue-50 border-b-2 border-blue-200",
+        itemClassName: "hover:bg-blue-50",
+
+        // Granular overrides
+        classNames: {
+            backdrop: "absolute inset-0 z-50",
+            itemSelected: "bg-blue-100 text-blue-900 border-l-4 border-blue-500 rounded-r-lg rounded-l-none",
+        }
+    },
+};

@@ -1,4 +1,4 @@
-# spotlight-omni-search 🔍 (v2.4.0)
+# spotlight-omni-search 🔍 (v2.4.1)
 
 🔗 **[Live Demo & Documentation](https://spotlight-omni-search-docs.netlify.app/)**
 
@@ -197,6 +197,26 @@ import { CalculatorPlugin } from "spotlight-omni-search";
   theme="midnight"
   layout="top"
   items={items}
+>
+```
+
+---
+
+## 💅 Custom Styling
+
+You can granularly style every part of the component using `classNames` or specific props like `headerClassName`.
+
+```tsx
+<SpotlightProvider
+  // ... other props
+  className="shadow-2xl rounded-xl border-blue-100" // Main container style
+  headerClassName="z-[9999] border-b-2 border-primary" // Header style
+  itemClassName="hover:bg-primary/10 transition-colors" // Default item style
+
+  // Advanced: Granular overrides still available
+  classNames={{
+    itemSelected: 'bg-primary/20'
+  }}
 >
 ```
 

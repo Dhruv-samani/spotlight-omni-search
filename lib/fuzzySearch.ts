@@ -15,10 +15,20 @@ export interface FuzzyMatchResult {
  * - Bonus for matches at word boundaries
  * - Case-insensitive
  */
-export function fuzzyMatch(query: string, text: string): FuzzyMatchResult | null {
+/**
+ * Performs fuzzy matching on a string
+ * Returns a score and the positions of matched characters
+ * 
+ * Algorithm:
+ * - Sequential character matching (characters must appear in order)
+ * - Bonus for consecutive matches
+ * - Bonus for matches at word boundaries
+ * - Case-insensitive (assumes queryLower is passed for performance, or computes it)
+ */
+export function fuzzyMatch(query: string, text: string, queryLower?: string): FuzzyMatchResult | null {
   if (!query || !text) return null;
 
-  const queryLower = query.toLowerCase();
+  const qType = queryLower ?? query.toLowerCase();
   const textLower = text.toLowerCase();
   
   let score = 0;
@@ -26,8 +36,8 @@ export function fuzzyMatch(query: string, text: string): FuzzyMatchResult | null
   const matches: number[] = [];
   let consecutiveBonus = 0;
 
-  for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
-    if (textLower[i] === queryLower[queryIndex]) {
+  for (let i = 0; i < textLower.length && queryIndex < qType.length; i++) {
+    if (textLower[i] === qType[queryIndex]) {
       matches.push(i);
       
       // Base score for match
@@ -54,7 +64,7 @@ export function fuzzyMatch(query: string, text: string): FuzzyMatchResult | null
   }
 
   // All characters must match
-  if (queryIndex !== queryLower.length) {
+  if (queryIndex !== qType.length) {
     return null;
   }
 
@@ -63,24 +73,52 @@ export function fuzzyMatch(query: string, text: string): FuzzyMatchResult | null
 
 /**
  * Searches multiple fields of an item
+ * Optimized to avoid array allocations in the loop
  */
-function searchItem(item: SpotlightItem, query: string): FuzzyMatchResult | null {
-  const fields = [
-    { text: item.label, weight: 3 },
-    { text: item.description || '', weight: 1 },
-    { text: item.group || '', weight: 1 },
-    ...(item.keywords || []).map(k => ({ text: k, weight: 2 })),
-  ];
-
+function searchItem(item: SpotlightItem, query: string, queryLower: string): FuzzyMatchResult | null {
   let bestMatch: FuzzyMatchResult | null = null;
+  let currentMatch: FuzzyMatchResult | null;
+  let weightedScore: number;
 
-  for (const field of fields) {
-    const match = fuzzyMatch(query, field.text);
-    if (match) {
-      const weightedScore = match.score * field.weight;
+  // Check Label (Weight: 3)
+  currentMatch = fuzzyMatch(query, item.label, queryLower);
+  if (currentMatch) {
+    weightedScore = currentMatch.score * 3;
+    bestMatch = { ...currentMatch, score: weightedScore };
+  }
+
+  // Check Description (Weight: 1)
+  if (item.description) {
+    currentMatch = fuzzyMatch(query, item.description, queryLower);
+    if (currentMatch) {
+      weightedScore = currentMatch.score * 1;
       if (!bestMatch || weightedScore > bestMatch.score) {
-        bestMatch = { ...match, score: weightedScore };
+        bestMatch = { ...currentMatch, score: weightedScore };
       }
+    }
+  }
+
+  // Check Group (Weight: 1)
+  if (item.group) {
+    currentMatch = fuzzyMatch(query, item.group, queryLower);
+    if (currentMatch) {
+      weightedScore = currentMatch.score * 1;
+      if (!bestMatch || weightedScore > bestMatch.score) {
+        bestMatch = { ...currentMatch, score: weightedScore };
+      }
+    }
+  }
+
+  // Check Keywords (Weight: 2)
+  if (item.keywords) {
+    for (const keyword of item.keywords) {
+        currentMatch = fuzzyMatch(query, keyword, queryLower);
+        if (currentMatch) {
+          weightedScore = currentMatch.score * 2;
+          if (!bestMatch || weightedScore > bestMatch.score) {
+            bestMatch = { ...currentMatch, score: weightedScore };
+          }
+        }
     }
   }
 
@@ -102,10 +140,11 @@ export function fuzzyFilter(items: SpotlightItem[], query: string): ScoredItem[]
     return items.map(item => ({ item, score: 0, matches: [] }));
   }
 
+  const queryLower = query.toLowerCase();
   const scored: ScoredItem[] = [];
 
   for (const item of items) {
-    const match = searchItem(item, query);
+    const match = searchItem(item, query, queryLower);
     if (match) {
       scored.push({
         item,

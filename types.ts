@@ -48,13 +48,13 @@ export interface ConfirmationOptions {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  type?: 'danger' | 'warning' | 'info';
+  type?: "danger" | "warning" | "info";
 }
 
 export interface SpotlightToast {
   id: string;
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: "success" | "error" | "info";
   duration?: number;
 }
 
@@ -144,39 +144,48 @@ export interface SpotlightProps {
    * Custom render function for items
    * If provided, this will be used instead of the default item rendering
    */
+  /**
+   * Custom render function for items
+   * If provided, this will be used instead of the default item rendering
+   */
   renderItem?: (item: SpotlightItem, isSelected: boolean) => ReactNode;
+
+  /**
+   * Custom class name for the container
+   */
+  className?: string;
 
   // Keyboard Navigation
   keyboardShortcuts?: KeyboardShortcuts;
   enableVimNavigation?: boolean;
   enableNumberJump?: boolean;
-  onEscapeBehavior?: 'close' | 'clear' | 'custom';
+  onEscapeBehavior?: "close" | "clear" | "custom";
   onEscapeCustom?: () => void;
 
   // Accessibility
   ariaLabel?: string;
   announceResults?: boolean;
-  
+
   // Custom Rendering
   renderEmpty?: () => ReactNode;
   renderLoading?: () => ReactNode;
   renderHeader?: (searchBar: ReactNode) => ReactNode;
   renderFooter?: () => ReactNode;
   renderGroupHeader?: (group: string) => ReactNode;
-  
+
   // Theme
   theme?: string | { variables: Record<string, string> };
-  
+
   // Layout
   layout?: SpotlightLayout;
-  
+
   // Responsive
   mobileBreakpoint?: number;
   tabletBreakpoint?: number;
   enableTouchGestures?: boolean;
-  
+
   // Plugins
-  plugins?: import('./types/plugin').SpotlightPlugin[];
+  plugins?: import("./types/plugin").SpotlightPlugin[];
 
   /**
    * Optional async search callback.
@@ -208,19 +217,29 @@ export interface SpotlightProps {
    * @default false
    */
   enableGoogleSearch?: boolean;
-  
+
   /**
    * Enable headless mode - removes default styling, allowing full custom styling via classNames
    * @default false
    */
   headless?: boolean;
-  
+
   /**
    * Custom class names for all component elements
    * In headless mode, these replace default classes. In normal mode, they merge with defaults.
    */
   classNames?: SpotlightClassNames;
-  
+
+  /**
+   * Additional class for the header container
+   */
+  headerClassName?: string;
+
+  /**
+   * Additional class for result items
+   */
+  itemClassName?: string;
+
   /**
    * Enable virtual scrolling for large lists
    * - true: Always use virtual scrolling
@@ -228,14 +247,14 @@ export interface SpotlightProps {
    * - 'auto': Auto-enable when items exceed threshold (default)
    * @default 'auto'
    */
-  enableVirtualScrolling?: boolean | 'auto';
-  
+  enableVirtualScrolling?: boolean | "auto";
+
   /**
    * Threshold for auto-enabling virtual scrolling
    * @default 500
    */
   virtualScrollThreshold?: number;
-  
+
   /**
    * Number of items to render outside visible area for smoother scrolling
    * @default 5
@@ -244,13 +263,13 @@ export interface SpotlightProps {
 }
 
 export type SpotlightLayout =
-  | 'center'
-  | 'top'
-  | 'side-left'
-  | 'side-right'
-  | 'bottom'
-  | 'fullscreen'
-  | 'compact';
+  | "center"
+  | "top"
+  | "side-left"
+  | "side-right"
+  | "bottom"
+  | "fullscreen"
+  | "compact";
 
 export interface KeyboardShortcuts {
   up?: string[];
@@ -261,4 +280,3 @@ export interface KeyboardShortcuts {
   nextGroup?: string[];
   prevGroup?: string[];
 }
-

@@ -74,22 +74,28 @@ export function Spotlight({
     enableGoogleSearch = false,
     // Headless Mode
     headless = false,
+    className,
     classNames,
+    headerClassName,
+    itemClassName,
     // Virtual Scrolling
     enableVirtualScrolling = 'auto',
     virtualScrollThreshold = 500,
     virtualScrollOverscan = 5,
 }: SpotlightProps) {
     // Helper to merge classes based on headless mode
-    const mergeClasses = useCallback((defaultClasses: string, customKey?: keyof import('./types').SpotlightClassNames) => {
+    const mergeClasses = useCallback((defaultClasses: string, customKey?: keyof import('./types').SpotlightClassNames, ...moreClasses: (string | undefined | null | false)[]) => {
         if (headless) {
             // In headless mode, only use custom classes
-            return customKey && classNames?.[customKey] ? classNames[customKey] : '';
+            const customClass = customKey && classNames?.[customKey] ? classNames[customKey] : '';
+            return cn(customClass, ...moreClasses);
         }
         // In normal mode, merge default with custom
-        return customKey && classNames?.[customKey]
+        const baseClass = customKey && classNames?.[customKey]
             ? cn(defaultClasses, classNames[customKey])
             : defaultClasses;
+
+        return cn(baseClass, ...moreClasses);
     }, [headless, classNames]);
     const [query, setQuery] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -340,7 +346,7 @@ export function Spotlight({
     }, [query]);
 
     // Handle Action Execution
-    const executeItem = (item: SpotlightItem) => {
+    const executeItem = useCallback((item: SpotlightItem) => {
         logEvent('item_execute_attempt', { id: item.id, label: item.label });
 
         // Plugin Hook: onSelect
@@ -374,9 +380,9 @@ export function Spotlight({
         }
 
         performAction(finalItem, args);
-    };
+    }, [items, query, pendingAction, runOnSelect, logEvent]); // verify dependencies
 
-    const performAction = (item: SpotlightItem, args?: string) => {
+    const performAction = useCallback((item: SpotlightItem, args?: string) => {
         logEvent('item_execute', { id: item.id, label: item.label, args });
 
         // Track in recent items
@@ -402,17 +408,18 @@ export function Spotlight({
             logEvent('navigate', { route: item.route });
             onClose();
         }
-    };
+    }, [query, addRecentItem, addToHistory, logEvent, showToast, onClose, onNavigate]);
 
     // Navigation Actions
-    const handleUp = () => {
+    const handleUp = useCallback(() => {
         interactionMode.current = 'keyboard';
         setSelectedIndex(prev => prev > 0 ? prev - 1 : 0);
-    };
-    const handleDown = () => {
+    }, []);
+
+    const handleDown = useCallback(() => {
         interactionMode.current = 'keyboard';
         setSelectedIndex(prev => prev < filteredItems.length - 1 ? prev + 1 : prev);
-    };
+    }, [filteredItems.length]);
 
     const handleSelect = useCallback(() => {
         // Use functional state or latest ref to be absolutely sure
@@ -421,33 +428,33 @@ export function Spotlight({
     }, [filteredItems, selectedIndex, executeItem]);
 
     // Page Up/Down with Standard Jump Size
-    const handlePageUp = () => {
+    const handlePageUp = useCallback(() => {
         interactionMode.current = 'keyboard';
         setSelectedIndex(prev => Math.max(prev - 10, 0));
-    };
+    }, []);
 
-    const handlePageDown = () => {
+    const handlePageDown = useCallback(() => {
         interactionMode.current = 'keyboard';
         setSelectedIndex(prev => Math.min(prev + 10, filteredItems.length - 1));
-    };
+    }, [filteredItems.length]);
 
-    const handleNextGroup = () => {
+    const handleNextGroup = useCallback(() => {
         if (filteredItems.length === 0) return;
         const currentGroup = filteredItems[selectedIndex]?.item.group;
         // Find next item with different group
-        const nextIndex = filteredItems.findIndex((item, i) => i > selectedIndex && item.item.group !== currentGroup);
+        const nextIndex = filteredItems.findIndex((item: ScoredItem, i: number) => i > selectedIndex && item.item.group !== currentGroup);
         if (nextIndex !== -1) {
             setSelectedIndex(nextIndex);
         } else {
             setSelectedIndex(0); // Cycle to start
         }
-    };
+    }, [filteredItems, selectedIndex]);
 
-    const handlePrevGroup = () => {
+    const handlePrevGroup = useCallback(() => {
         if (filteredItems.length === 0) return;
         const currentGroup = filteredItems[selectedIndex]?.item.group;
         // Find start of current group
-        const groupStartIndex = filteredItems.findIndex(item => item.item.group === currentGroup);
+        const groupStartIndex = filteredItems.findIndex((item: ScoredItem) => item.item.group === currentGroup);
 
         if (selectedIndex > groupStartIndex) {
             setSelectedIndex(groupStartIndex);
@@ -456,7 +463,7 @@ export function Spotlight({
             for (let i = groupStartIndex - 1; i >= 0; i--) {
                 if (filteredItems[i].item.group !== currentGroup) {
                     const prevGroup = filteredItems[i].item.group;
-                    const prevGroupStart = filteredItems.findIndex(item => item.item.group === prevGroup);
+                    const prevGroupStart = filteredItems.findIndex((item: ScoredItem) => item.item.group === prevGroup);
                     setSelectedIndex(prevGroupStart);
                     return;
                 }
@@ -464,16 +471,16 @@ export function Spotlight({
             // Cycle to last item if no prev group
             setSelectedIndex(filteredItems.length - 1);
         }
-    };
+    }, [filteredItems, selectedIndex]);
 
-    const handleNumberJump = (num: number) => {
-        const groups = getUniqueGroups(filteredItems.map(s => s.item));
+    const handleNumberJump = useCallback((num: number) => {
+        const groups = getUniqueGroups(filteredItems.map((s: ScoredItem) => s.item));
         if (num >= 1 && num <= groups.length) {
             const groupName = groups[num - 1].value;
-            const index = filteredItems.findIndex(s => (s.item.group || 'Other') === groupName);
+            const index = filteredItems.findIndex((s: ScoredItem) => (s.item.group || 'Other') === groupName);
             if (index !== -1) setSelectedIndex(index);
         }
-    };
+    }, [filteredItems]);
 
     // Keyboard Navigation Hook
     const { handleKeyDown } = useKeyboardShortcuts({
@@ -554,7 +561,7 @@ export function Spotlight({
 
     // Layout Styles
     const layoutClasses = useMemo(() => {
-        const baseOuter = "fixed inset-0 z-50 flex bg-background/80 backdrop-blur-sm transition-all duration-200";
+        const baseOuter = "fixed inset-0 z-[999] flex bg-background/80 backdrop-blur-sm transition-all duration-200";
         const baseInner = "relative w-full bg-popover shadow-2xl border border-border overflow-hidden animate-in fade-in zoom-in-95 duration-200";
 
         switch (layout) {
@@ -620,6 +627,89 @@ export function Spotlight({
         }
     }, [modalRef, swipeRef]);
 
+    // Optimized Handlers
+    const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const next = e.target.value;
+        setUndoStack(prev => {
+            const last = prev[prev.length - 1];
+            if (last === query) return prev;
+            return [...prev.slice(-49), query];
+        });
+        setRedoStack([]);
+        setQuery(next);
+    }, [query]);
+
+    const handleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+        // Robust Key Handling
+        const key = e.key;
+
+        // Undo/Redo (Phase 3.2 extension)
+        if ((e.metaKey || e.ctrlKey) && key === 'z') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                // Redo
+                if (redoStack.length > 0) {
+                    const next = redoStack[redoStack.length - 1];
+                    setRedoStack(prev => prev.slice(0, -1));
+                    setUndoStack(prev => [...prev, query]);
+                    setQuery(next);
+                    logEvent('redo', { query: next });
+                }
+            } else {
+                // Undo
+                if (undoStack.length > 0) {
+                    const last = undoStack[undoStack.length - 1];
+                    setUndoStack(prev => prev.slice(0, -1));
+                    setRedoStack(prev => [...prev, query]);
+                    setQuery(last);
+                    logEvent('undo', { query: last });
+                }
+            }
+            return;
+        }
+        if ((e.metaKey || e.ctrlKey) && key === 'y') {
+            e.preventDefault();
+            if (redoStack.length > 0) {
+                const next = redoStack[redoStack.length - 1];
+                setRedoStack(prev => prev.slice(0, -1));
+                setUndoStack(prev => [...prev, query]);
+                setQuery(next);
+                logEvent('redo', { query: next });
+            }
+            return;
+        }
+
+        if (key === 'PageUp') {
+            e.preventDefault();
+            handlePageUp();
+        } else if (key === 'PageDown') {
+            e.preventDefault();
+            handlePageDown();
+        } else if (key === 'Enter') {
+            e.preventDefault();
+            handleSelect();
+        } else if (key === 'ArrowUp') {
+            e.preventDefault();
+            handleUp();
+        } else if (key === 'ArrowDown') {
+            e.preventDefault();
+            handleDown();
+        } else {
+            // Let hook handle others (Escape, Tab, etc.)
+            handleKeyDown(e);
+        }
+    }, [query, redoStack, undoStack, handlePageUp, handlePageDown, handleSelect, handleUp, handleDown, handleKeyDown, logEvent]);
+
+    const toggleRegexMode = useCallback(() => {
+        setRegexMode(prev => !prev);
+    }, []);
+
+    const handleGroupChange = useCallback((groupValue: string | null) => {
+        setActiveGroup(prev => prev === groupValue ? null : groupValue);
+    }, []);
+
+
+
     if (!isOpen) return null;
 
     return (
@@ -631,7 +721,7 @@ export function Spotlight({
         >
             <div
                 ref={setRefs}
-                className={mergeClasses(layoutClasses.inner, 'container')}
+                className={mergeClasses(layoutClasses.inner, 'container', className)}
                 onClick={e => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
@@ -643,23 +733,14 @@ export function Spotlight({
                     if (pluginHeader) return pluginHeader;
 
                     const defaultHeader = (
-                        <div className={mergeClasses("flex items-center gap-3 px-4 py-3 border-b border-border", 'header')}>
+                        <div className={mergeClasses("flex items-center gap-3 px-4 py-3 border-b border-border z-[999] relative", 'header', headerClassName)}>
                             <Search className={mergeClasses("w-5 h-5 text-muted-foreground", 'searchIcon')} aria-hidden="true" />
                             <input
                                 ref={inputRef}
                                 id={inputId}
                                 type="text"
                                 value={query}
-                                onChange={(e) => {
-                                    const next = e.target.value;
-                                    setUndoStack(prev => {
-                                        const last = prev[prev.length - 1];
-                                        if (last === query) return prev;
-                                        return [...prev.slice(-49), query];
-                                    });
-                                    setRedoStack([]);
-                                    setQuery(next);
-                                }}
+                                onChange={handleQueryChange}
                                 placeholder={searchPlaceholder}
                                 className={mergeClasses("flex-1 bg-transparent border-none outline-none text-base placeholder:text-muted-foreground", 'input')}
                                 autoFocus
@@ -668,66 +749,7 @@ export function Spotlight({
                                 aria-expanded={true}
                                 aria-controls={listId}
                                 aria-activedescendant={filteredItems[selectedIndex] ? `${listId}-item-${selectedIndex}` : undefined}
-                                onKeyDown={(e) => {
-                                    // Robust Key Handling
-                                    const key = e.key;
-
-                                    // Undo/Redo (Phase 3.2 extension)
-                                    if ((e.metaKey || e.ctrlKey) && key === 'z') {
-                                        e.preventDefault();
-                                        if (e.shiftKey) {
-                                            // Redo
-                                            if (redoStack.length > 0) {
-                                                const next = redoStack[redoStack.length - 1];
-                                                setRedoStack(prev => prev.slice(0, -1));
-                                                setUndoStack(prev => [...prev, query]);
-                                                setQuery(next);
-                                                logEvent('redo', { query: next });
-                                            }
-                                        } else {
-                                            // Undo
-                                            if (undoStack.length > 0) {
-                                                const last = undoStack[undoStack.length - 1];
-                                                setUndoStack(prev => prev.slice(0, -1));
-                                                setRedoStack(prev => [...prev, query]);
-                                                setQuery(last);
-                                                logEvent('undo', { query: last });
-                                            }
-                                        }
-                                        return;
-                                    }
-                                    if ((e.metaKey || e.ctrlKey) && key === 'y') {
-                                        e.preventDefault();
-                                        if (redoStack.length > 0) {
-                                            const next = redoStack[redoStack.length - 1];
-                                            setRedoStack(prev => prev.slice(0, -1));
-                                            setUndoStack(prev => [...prev, query]);
-                                            setQuery(next);
-                                            logEvent('redo', { query: next });
-                                        }
-                                        return;
-                                    }
-
-                                    if (key === 'PageUp') {
-                                        e.preventDefault();
-                                        handlePageUp();
-                                    } else if (key === 'PageDown') {
-                                        e.preventDefault();
-                                        handlePageDown();
-                                    } else if (key === 'Enter') {
-                                        e.preventDefault();
-                                        handleSelect();
-                                    } else if (key === 'ArrowUp') {
-                                        e.preventDefault();
-                                        handleUp();
-                                    } else if (key === 'ArrowDown') {
-                                        e.preventDefault();
-                                        handleDown();
-                                    } else {
-                                        // Let hook handle others (Escape, Tab, etc.)
-                                        handleKeyDown(e);
-                                    }
-                                }}
+                                onKeyDown={handleInputKeyDown}
                                 style={{ color: 'var(--spotlight-foreground)' }}
                             />
                         </div>
@@ -742,7 +764,7 @@ export function Spotlight({
                     <div className={mergeClasses("flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20 overflow-x-auto no-scrollbar scroll-fade", 'filtersBar')}>
                         {/* Regex Toggle */}
                         <button
-                            onClick={() => setRegexMode(!regexMode)}
+                            onClick={toggleRegexMode}
                             className={mergeClasses(cn(
                                 "flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors border",
                                 regexMode
@@ -759,7 +781,7 @@ export function Spotlight({
 
                         {/* Group Filters */}
                         <button
-                            onClick={() => setActiveGroup(null)}
+                            onClick={() => handleGroupChange(null)}
                             className={mergeClasses(cn(
                                 "px-2 py-1 rounded text-[10px] font-medium transition-colors whitespace-nowrap",
                                 !activeGroup
@@ -772,7 +794,7 @@ export function Spotlight({
                         {getUniqueGroups(items).map((group) => (
                             <button
                                 key={group.value}
-                                onClick={() => setActiveGroup(activeGroup === group.value ? null : group.value)}
+                                onClick={() => handleGroupChange(group.value)}
                                 className={mergeClasses(cn(
                                     "px-2 py-1 rounded text-[10px] font-medium transition-colors whitespace-nowrap flex items-center gap-1",
                                     activeGroup === group.value
@@ -853,7 +875,7 @@ export function Spotlight({
                                                     ? "bg-accent/80 text-accent-foreground"
                                                     : "text-foreground hover:bg-accent/80 hover:text-accent-foreground",
                                                 item.disabled && "opacity-50 cursor-not-allowed pointer-events-none"
-                                            ), selectedIndex === index ? 'itemSelected' : 'item')}
+                                            ), 'item', itemClassName)}
                                         >
                                             {renderItem ? renderItem(item, index === selectedIndex) : (
                                                 <>
@@ -928,7 +950,7 @@ export function Spotlight({
                                                 // Make hover state identical to selected state immediately
                                                 : "text-foreground hover:bg-accent/80 hover:text-accent-foreground",
                                             item.disabled && "opacity-50 cursor-not-allowed pointer-events-none"
-                                        ), selectedIndex === index ? 'itemSelected' : 'item')}
+                                        ), 'item', itemClassName)}
                                     >
                                         {renderItem ? renderItem(item, index === selectedIndex) : (
                                             <>
