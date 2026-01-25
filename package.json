@@ -1,6 +1,6 @@
 {
   "name": "spotlight-omni-search",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "type": "module",
   "description": "Universal Command Palette & Global Search for React with Built-in Calculator",
   "main": "./dist/index.umd.js",

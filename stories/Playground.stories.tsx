@@ -5,6 +5,8 @@ import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
 import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
 import { CalculatorPlugin } from '../plugins/calculator';
+import { NestedCommandsPlugin } from '../plugins/nested';
+import { VirtualScrollingPlugin } from '../plugins/virtual';
 import '../dev/index.css'; // Import Playground specific styles
 // Note: library index.css is imported globally in preview.ts or inside SpotlightProvider, 
 // but dev/main.tsx imported it explicitly. Spotlight component usually expects it.
@@ -20,7 +22,8 @@ import {
     Code,
     Copy,
     Check,
-    Shield
+    Shield,
+    Folder
 } from 'lucide-react';
 
 const meta: Meta = {
@@ -60,35 +63,55 @@ const Playground = () => {
     const [enableGoogle, setEnableGoogle] = useState(true);
     const [enableVim, setEnableVim] = useState(false);
     const [enableRecent, setEnableRecent] = useState(true);
+    const [enableNested, setEnableNested] = useState(false);
     const [headless, setHeadless] = useState(false);
     const [useLargeDataset, setUseLargeDataset] = useState(false);
     const [copied, setCopied] = useState(false);
 
-    const items: SpotlightItem[] = useMemo(() => [
-        { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation' },
-        { id: '2', label: 'Analytics', type: 'page', group: 'Navigation' },
-        { id: '3', label: 'User Settings', type: 'page', group: 'System' },
-        { id: '4', label: 'Billing & Plans', type: 'page', group: 'System' },
+    const items: SpotlightItem[] = useMemo(() => {
+        if (enableNested) {
+            return [
+                {
+                    id: 'settings', label: 'Settings', type: 'group', items: [
+                        { id: 'profile', label: 'Profile', type: 'page' },
+                        { id: 'billing', label: 'Billing', type: 'page' },
+                    ]
+                },
+                {
+                    id: 'docs', label: 'Documentation', type: 'page', items: [
+                        { id: 'api', label: 'API Reference', type: 'page' },
+                        { id: 'guides', label: 'User Guides', type: 'page' },
+                    ]
+                },
+                { id: 'home', label: 'Home', type: 'page' }
+            ];
+        }
+        return [
+            { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation' },
+            { id: '2', label: 'Analytics', type: 'page', group: 'Navigation' },
+            { id: '3', label: 'User Settings', type: 'page', group: 'System' },
+            { id: '4', label: 'Billing & Plans', type: 'page', group: 'System' },
 
-        // Theme Actions
-        { id: 'theme-light', label: 'Switch to Light Mode', type: 'action', group: 'Theme', action: () => setTheme('light') },
-        { id: 'theme-dark', label: 'Switch to Dark Mode', type: 'action', group: 'Theme', action: () => setTheme('dark') },
-        { id: 'theme-slate', label: 'Switch to Slate Theme', type: 'action', group: 'Theme', action: () => setTheme('slate') },
-        { id: 'theme-rose', label: 'Switch to Rose Theme', type: 'action', group: 'Theme', action: () => setTheme('rose') },
-        { id: 'theme-violet', label: 'Switch to Violet Theme', type: 'action', group: 'Theme', action: () => setTheme('violet') },
-        { id: 'theme-amber', label: 'Switch to Amber Theme', type: 'action', group: 'Theme', action: () => setTheme('amber') },
-        { id: 'theme-midnight', label: 'Switch to Midnight Theme', type: 'action', group: 'Theme', action: () => setTheme('midnight') },
+            // Theme Actions
+            { id: 'theme-light', label: 'Switch to Light Mode', type: 'action', group: 'Theme', action: () => setTheme('light') },
+            { id: 'theme-dark', label: 'Switch to Dark Mode', type: 'action', group: 'Theme', action: () => setTheme('dark') },
+            { id: 'theme-slate', label: 'Switch to Slate Theme', type: 'action', group: 'Theme', action: () => setTheme('slate') },
+            { id: 'theme-rose', label: 'Switch to Rose Theme', type: 'action', group: 'Theme', action: () => setTheme('rose') },
+            { id: 'theme-violet', label: 'Switch to Violet Theme', type: 'action', group: 'Theme', action: () => setTheme('violet') },
+            { id: 'theme-amber', label: 'Switch to Amber Theme', type: 'action', group: 'Theme', action: () => setTheme('amber') },
+            { id: 'theme-midnight', label: 'Switch to Midnight Theme', type: 'action', group: 'Theme', action: () => setTheme('midnight') },
 
-        { id: '6', label: 'Google Recent News', type: 'action', group: 'External', action: (args?: string) => window.open(`https://google.com/search?q=\${args}`) },
-        {
-            id: '7',
-            label: 'Delete User Profile',
-            type: 'action',
-            group: 'Danger',
-            confirm: { title: 'Delete Profile?', message: 'This cannot be undone.', type: 'danger' },
-            action: () => alert('Deleted!')
-        },
-    ], []);
+            { id: '6', label: 'Google Recent News', type: 'action', group: 'External', action: (args?: string) => window.open(`https://google.com/search?q=\${args}`) },
+            {
+                id: '7',
+                label: 'Delete User Profile',
+                type: 'action',
+                group: 'Danger',
+                confirm: { title: 'Delete Profile?', message: 'This cannot be undone.', type: 'danger' },
+                action: () => alert('Deleted!')
+            },
+        ];
+    }, [enableNested]);
 
     // Generate large dataset for virtual scrolling testing
     const largeDataset: SpotlightItem[] = useMemo(() => {
@@ -110,22 +133,34 @@ const Playground = () => {
 
     const activeItems = useLargeDataset ? largeDataset : items;
 
-    const plugins = useMemo(() => [
-        CalculatorPlugin({
-            enableClipboardCopy: true,
-            precision: 10,
-            icon: <Code size={16} className="text-blue-500" /> // Using Lucide icon
-        }),
-        AnalyticsPlugin({
-            // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
-            // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
-        }),
-        GoogleAnalyticsPlugin({
-            measurementId: 'G-JQXKL5EW07',
-            enableDebug: false,
-            loadScript: true,
-        })
-    ], []);
+    const plugins = useMemo(() => {
+        const p = [
+            CalculatorPlugin({
+                enableClipboardCopy: true,
+                precision: 10,
+                icon: <Code size={16} className="text-blue-500" /> // Using Lucide icon
+            }),
+            AnalyticsPlugin({
+                // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
+                // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
+            }),
+            GoogleAnalyticsPlugin({
+                measurementId: 'G-JQXKL5EW07',
+                enableDebug: false,
+                loadScript: true,
+            })
+        ];
+
+        if (enableNested) {
+            p.push(NestedCommandsPlugin({ backKey: 'Backspace' }));
+        }
+
+        if (useLargeDataset) {
+            p.push(VirtualScrollingPlugin({ windowSize: 20 }));
+        }
+
+        return p;
+    }, [enableNested, useLargeDataset]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(codeSnippet);
@@ -239,9 +274,10 @@ const Playground = () => {
                                     { id: 'debug', label: 'Debug Mode', desc: 'Display search scores and latency', icon: <Monitor size={18} />, value: debug, setter: setDebug },
                                     { id: 'google', label: 'Google Search', desc: 'Allow direct web search fallback', icon: <Smartphone size={18} />, value: enableGoogle, setter: setEnableGoogle },
                                     { id: 'history', label: 'Record History', desc: 'Persist search queries locally', icon: <History size={18} />, value: enableRecent, setter: setEnableRecent },
+                                    { id: 'nested', label: 'Nested Commands', desc: 'Folder-like navigation structure', icon: <Folder size={18} />, value: enableNested, setter: setEnableNested },
                                     { id: 'vim', label: 'Vim Navigation', desc: 'Support h, j, k, l movement', icon: <Zap size={18} />, value: enableVim, setter: setEnableVim },
                                     { id: 'headless', label: 'Headless Mode', desc: 'Remove default styling (bring your own CSS)', icon: <Code size={18} />, value: headless, setter: setHeadless },
-                                    { id: 'largedata', label: 'Large Dataset (1000 items)', desc: 'Test virtual scrolling performance', icon: <Monitor size={18} />, value: useLargeDataset, setter: setUseLargeDataset },
+                                    { id: 'largedata', label: 'Large Dataset (Virtual)', desc: 'Test virtual scrolling performance', icon: <Monitor size={18} />, value: useLargeDataset, setter: setUseLargeDataset },
                                 ].map((f) => (
                                     <div key={f.id} className="glass-card p-6 flex items-start justify-between">
                                         <div className="flex items-start gap-4">

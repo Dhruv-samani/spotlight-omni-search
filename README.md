@@ -1,4 +1,4 @@
-# spotlight-omni-search 🔍 (v2.4.1)
+# spotlight-omni-search 🔍 (v2.4.2)
 
 🔗 **[Live Demo & Documentation](https://spotlight-omni-search-docs.netlify.app/)**
 
@@ -178,6 +178,85 @@ import { CalculatorPlugin } from "spotlight-omni-search";
 **Supported operators:** `+`, `-`, `*`, `/`, `%`, `^` (exponentiation)
 
 **Security:** Safe evaluation - blocks dangerous code like `alert()`, `window`, etc.
+
+### 📊 Analytics Plugin
+
+Track searches and selections locally.
+
+```tsx
+import { AnalyticsPlugin } from "spotlight-omni-search";
+
+const analytics = AnalyticsPlugin({
+  enableSessionTracking: true,
+  onSearch: (query) => console.log("Searching:", query),
+  onSelect: (id, type) => console.log("Selected:", id),
+});
+
+// ... inside plugins prop
+plugins: [analytics];
+
+// Export data later
+console.log(analytics.exportData("csv"));
+```
+
+### 📈 Google Analytics 4
+
+seamless integration with GA4.
+
+```tsx
+import { GoogleAnalyticsPlugin } from "spotlight-omni-search";
+
+plugins: [
+  GoogleAnalyticsPlugin({
+    measurementId: "G-XXXXXXXXXX",
+    enableDebug: true, // Log events to console
+    loadScript: true, // Auto-inject GA script
+  }),
+];
+```
+
+### 🪜 Nested Commands Plugin
+
+Create folder-like navigation structures. When an item with `items` array is selected, it "zooms in" to those items.
+
+```tsx
+import { NestedCommandsPlugin } from "spotlight-omni-search";
+import { NestedPlugin } from "spotlight-omni-search/plugins/nested"; // or from main export if available
+
+plugins: [
+  NestedCommandsPlugin({
+    backKey: "Backspace", // 'Backspace' or 'Escape' to go up a level
+  }),
+];
+
+// Item Structure
+const items = [
+  {
+    id: "settings",
+    label: "Settings",
+    items: [
+      // Children
+      { id: "profile", label: "Profile" },
+      { id: "billing", label: "Billing" },
+    ],
+  },
+];
+```
+
+### ⚡ Virtual Scrolling Plugin
+
+Optimize performance for large lists by rendering only a window of results.
+
+```tsx
+import { VirtualScrollingPlugin } from "spotlight-omni-search";
+
+plugins: [
+  VirtualScrollingPlugin({
+    windowSize: 20, // Only render 20 items at a time
+    itemHeight: 40,
+  }),
+];
+```
 
 ---
 
