@@ -46,6 +46,12 @@ export {
 export { NestedCommandsPlugin } from "./plugins/nested"; // Check if options need export
 export { VirtualScrollingPlugin } from "./plugins/virtual";
 
+// New Plugins (v2.5.0+)
+export { RecentSearchesPlugin, type RecentSearchesOptions } from "./plugins/recent-searches";
+export { UnitConverterPlugin, type UnitConverterOptions } from "./plugins/unit-converter";
+export { BookmarksPlugin, type BookmarksOptions, isBookmarked } from "./plugins/bookmarks";
+export { ShortcutsPanelPlugin, type ShortcutsPanelOptions, type KeyboardShortcut, getKeyboardShortcuts } from "./plugins/shortcuts-panel";
+
 // Existing exports not explicitly modified but still needed
 export * from "./adapters/routes";
 export * from "./actions/commonActions";

@@ -122,6 +122,19 @@ function searchItem(item: SpotlightItem, query: string, queryLower: string): Fuz
     }
   }
 
+  // Check Aliases (Weight: 2.5) - Higher than keywords, lower than label
+  if (item.aliases) {
+    for (const alias of item.aliases) {
+        currentMatch = fuzzyMatch(query, alias, queryLower);
+        if (currentMatch) {
+          weightedScore = currentMatch.score * 2.5;
+          if (!bestMatch || weightedScore > bestMatch.score) {
+            bestMatch = { ...currentMatch, score: weightedScore };
+          }
+        }
+    }
+  }
+
   return bestMatch;
 }
 

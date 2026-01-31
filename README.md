@@ -1,6 +1,12 @@
-# spotlight-omni-search 🔍 (v2.4.2)
+# spotlight-omni-search 🔍
 
-🔗 **[Live Demo & Documentation](https://spotlight-omni-search-docs.netlify.app/)**
+[![npm version](https://img.shields.io/npm/v/spotlight-omni-search.svg?style=flat-square)](https://www.npmjs.com/package/spotlight-omni-search)
+[![npm downloads](https://img.shields.io/npm/dm/spotlight-omni-search.svg?style=flat-square)](https://www.npmjs.com/package/spotlight-omni-search)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/spotlight-omni-search?style=flat-square)](https://bundlephobia.com/package/spotlight-omni-search)
+[![license](https://img.shields.io/npm/l/spotlight-omni-search.svg?style=flat-square)](https://github.com/Dhruv-samani/spotlight-omni-search/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Dhruv-samani/spotlight-omni-search?style=flat-square)](https://github.com/Dhruv-samani/spotlight-omni-search)
+
+🔗 **[Live Demo & Documentation](https://spotlight-omni-search-docs.netlify.app/)** | [GitHub](https://github.com/Dhruv-samani/spotlight-omni-search)
 
 A professional, **Tailwind-Native** Spotlight Search component for React and Next.js. Engineered to blend perfectly into your existing design system without shipping any global CSS resets or side effects.
 
@@ -11,6 +17,11 @@ A professional, **Tailwind-Native** Spotlight Search component for React and Nex
 - **🎯 Simple Setup**: One-line integration with `SpotlightProvider`.
 - **🔘 Pre-styled Components**: Includes a beautiful `SearchTrigger` button.
 - **🧮 Built-in Calculator**: Type `2 + 2` and get instant results!
+- **🔄 Unit Converter** (NEW): Convert `100 km to miles`, `32 F to C`, and more!
+- **🔍 Recent Searches** (NEW): Track and re-run previous searches.
+- **⭐ Bookmarks** (NEW): Star your favorite commands for quick access.
+- **⌨️ Shortcuts Panel** (NEW): Press `?` to view all keyboard shortcuts.
+- **🏷️ Command Aliases** (NEW): Find commands with alternative names (e.g., "prefs" → "Settings").
 - **⚡ Performance**: Virtual scrolling for 1000+ items and instant search.
 - **🎨 Theming**: 20+ pre-built themes (Dark, Light, Slate, Blue, etc.).
 - **🛠️ Advanced**: Async search, command arguments, and undo/redo support.
@@ -20,7 +31,31 @@ A professional, **Tailwind-Native** Spotlight Search component for React and Nex
 
 ---
 
-## 📦 Installation
+## 📊 Why Choose spotlight-omni-search?
+
+| Feature                   | spotlight-omni-search           | cmdk              | kbar              |
+| ------------------------- | ------------------------------- | ----------------- | ----------------- |
+| **Built-in Calculator**   | ✅ Math expressions             | ❌                | ❌                |
+| **Unit Converter** (NEW)  | ✅ Length, weight, temp, volume | ❌                | ❌                |
+| **Recent Searches** (NEW) | ✅ Smart history                | ❌                | ❌                |
+| **Bookmarks** (NEW)       | ✅ Star favorites               | ❌                | ❌                |
+| **Shortcuts Panel** (NEW) | ✅ Press `?` to view            | ❌                | ❌                |
+| **Command Aliases** (NEW) | ✅ Alternative names            | ❌                | ❌                |
+| **Pre-built Themes**      | ✅ 20+ themes                   | ❌ Manual styling | ❌ Manual styling |
+| **Tailwind-Native**       | ✅ No CSS conflicts             | ⚠️ Custom CSS     | ⚠️ Custom CSS     |
+| **Virtual Scrolling**     | ✅ Built-in                     | ❌                | ❌                |
+| **Trigger Button**        | ✅ Pre-styled                   | ❌ Build your own | ❌ Build your own |
+| **Async Search**          | ✅                              | ✅                | ✅                |
+| **Nested Commands**       | ✅ Plugin                       | ✅                | ✅                |
+| **Analytics Plugin**      | ✅ Built-in                     | ❌                | ❌                |
+| **Bundle Size**           | ~15KB gzipped                   | ~12KB             | ~10KB             |
+| **TypeScript**            | ✅                              | ✅                | ✅                |
+
+**Perfect for:** Teams who want a **ready-to-use** command palette with minimal setup and beautiful defaults.
+
+---
+
+## �📦 Installation
 
 ```bash
 npm install spotlight-omni-search
@@ -146,6 +181,168 @@ Create powerful commands that accept user input (e.g., "Google [query]").
   action: (query) => window.open(`https://google.com/search?q=${query}`)
 }
 ```
+
+### Built-in Calculator Plugin 🧮
+
+Evaluate math expressions directly in the search bar!
+
+```tsx
+import { SpotlightProvider } from "spotlight-omni-search/next";
+import { CalculatorPlugin } from "spotlight-omni-search";
+
+<SpotlightProvider
+  items={items}
+  plugins={[
+    CalculatorPlugin({
+      enableClipboardCopy: true, // Auto-copy result to clipboard
+      precision: 10, // Decimal precision
+      icon: <YourIconComponent /> // Optional: any icon library
+    })
+  ]}
+  onNavigate={navigate}
+>
+```
+
+**Try it:**
+
+- Type `2 + 2` → Get `4`
+- Type `(10 + 5) * 2` → Get `30`
+- Type `2 ^ 8` → Get `256`
+- Press Enter to copy result to clipboard!
+
+**Supported operators:** `+`, `-`, `*`, `/`, `%`, `^` (exponentiation)
+
+**Security:** Safe evaluation - blocks dangerous code like `alert()`, `window`, etc.
+
+### 🔄 Unit Converter Plugin (NEW in v2.5.0)
+
+Convert units on the fly - length, weight, temperature, and volume!
+
+```tsx
+import { UnitConverterPlugin } from "spotlight-omni-search";
+
+<SpotlightProvider
+  items={items}
+  plugins={[
+    UnitConverterPlugin({
+      enableClipboardCopy: true,
+      icon: <RulerIcon />
+    })
+  ]}
+>
+```
+
+**Try it:**
+
+- Type `100 km to miles` → Get `62.14 miles`
+- Type `32 F to C` → Get `0°C`
+- Type `5 kg to pounds` → Get `11.02 lb`
+- Type `2 liters to gallons` → Get `0.53 gal`
+
+**Supported conversions:** Length, Weight, Temperature, Volume
+
+### 🔍 Recent Searches Plugin (NEW in v2.5.0)
+
+Track and display search history for quick access.
+
+```tsx
+import { RecentSearchesPlugin } from "spotlight-omni-search";
+
+<SpotlightProvider
+  items={items}
+  plugins={[
+    RecentSearchesPlugin({
+      maxSearches: 10,
+      showInResults: true,
+      enableObfuscation: true // Privacy protection
+    })
+  ]}
+>
+```
+
+**Features:**
+
+- Shows recent searches when input is empty
+- Click to re-run previous searches
+- Privacy-protected with obfuscation
+- "Clear Recent Searches" action
+
+### ⭐ Bookmarks Plugin (NEW in v2.5.0)
+
+Star your favorite commands for quick access!
+
+```tsx
+import { BookmarksPlugin } from "spotlight-omni-search";
+
+<SpotlightProvider
+  items={items}
+  plugins={[
+    BookmarksPlugin({
+      maxBookmarks: 20,
+      showAtTop: true,
+      bookmarkIcon: <StarIcon />
+    })
+  ]}
+>
+```
+
+**Features:**
+
+- Bookmark frequently used commands
+- Bookmarks appear at top of results
+- Manage and clear bookmarks
+- Persistent across sessions
+
+### ⌨️ Keyboard Shortcuts Panel (NEW in v2.5.0)
+
+Never forget a shortcut again!
+
+```tsx
+import { ShortcutsPanelPlugin } from "spotlight-omni-search";
+
+<SpotlightProvider
+  items={items}
+  plugins={[
+    ShortcutsPanelPlugin({
+      triggerKey: '?',
+      customShortcuts: [
+        { key: 'Ctrl+B', description: 'Bookmark item', category: 'Actions' }
+      ]
+    })
+  ]}
+>
+```
+
+**Features:**
+
+- Press `?` to view all shortcuts
+- Organized by category
+- Add custom shortcuts
+- Searchable reference
+
+### 🏷️ Command Aliases (NEW in v2.5.0)
+
+Make commands easier to find with alternative names!
+
+```tsx
+const items = [
+  {
+    id: "settings",
+    label: "Settings",
+    aliases: ["preferences", "config", "options", "prefs"],
+    route: "/settings",
+  },
+];
+```
+
+**Benefits:**
+
+- Type "prefs" → finds "Settings"
+- Type "config" → finds "Settings"
+- More forgiving search
+- Better discoverability
+
+---
 
 ### Built-in Calculator Plugin 🧮
 

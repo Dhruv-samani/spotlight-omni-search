@@ -5,8 +5,13 @@ import { SearchTrigger } from '../components/SearchTrigger';
 import { NestedCommandsPlugin } from '../plugins/nested';
 import { VirtualScrollingPlugin } from '../plugins/virtual';
 import { AnalyticsPlugin } from '../plugins/analytics';
+import { CalculatorPlugin } from '../plugins/calculator';
+import { UnitConverterPlugin } from '../plugins/unit-converter';
+import { RecentSearchesPlugin } from '../plugins/recent-searches';
+import { BookmarksPlugin } from '../plugins/bookmarks';
+import { ShortcutsPanelPlugin } from '../plugins/shortcuts-panel';
 import { SpotlightItem } from '../types';
-import { ChevronRight, Folder, File, Activity, Zap } from 'lucide-react';
+import { ChevronRight, Folder, File, Activity, Zap, Calculator, Ruler, History, Star, Keyboard, Settings, Home, Users } from 'lucide-react';
 
 const meta: Meta<typeof SpotlightProvider> = {
     title: 'Demos/Plugins',
@@ -165,6 +170,263 @@ export const Analytics: Story = {
                         ))}
                     </div>
                 </div>
+            </Container>
+        );
+    }
+};
+
+// --- NEW v2.5.0 PLUGINS ---
+
+// --- Calculator + Unit Converter Story ---
+export const CalculatorAndConverter: Story = {
+    render: () => {
+        return (
+            <Container
+                title="Calculator & Unit Converter (NEW!)"
+                description="Type math expressions or unit conversions"
+            >
+                <SpotlightProvider
+                    items={[
+                        { id: 'home', label: 'Home', type: 'page', icon: <Home size={18} /> },
+                        { id: 'settings', label: 'Settings', type: 'page', icon: <Settings size={18} /> },
+                    ]}
+                    plugins={[
+                        CalculatorPlugin({
+                            enableClipboardCopy: true,
+                            icon: <Calculator size={18} className="text-purple-500" />
+                        }),
+                        UnitConverterPlugin({
+                            enableClipboardCopy: true,
+                            icon: <Ruler size={18} className="text-blue-500" />
+                        })
+                    ]}
+                    onNavigate={() => { }}
+                >
+                    <SearchTrigger className="w-full max-w-sm" />
+                    <div className="text-xs text-center mt-4 text-slate-600 space-y-1">
+                        <p className="font-semibold">Try these:</p>
+                        <p className="text-slate-400">Math: <code className="bg-slate-200 px-1 rounded">2 + 2</code> or <code className="bg-slate-200 px-1 rounded">(10 + 5) * 2</code></p>
+                        <p className="text-slate-400">Convert: <code className="bg-slate-200 px-1 rounded">100 km to miles</code> or <code className="bg-slate-200 px-1 rounded">32 F to C</code></p>
+                    </div>
+                </SpotlightProvider>
+            </Container>
+        );
+    }
+};
+
+// --- Recent Searches Story ---
+export const RecentSearches: Story = {
+    render: () => {
+        return (
+            <Container
+                title="Recent Searches (NEW!)"
+                description="Search history with privacy protection"
+            >
+                <SpotlightProvider
+                    items={[
+                        { id: 'home', label: 'Home', type: 'page', icon: <Home size={18} /> },
+                        { id: 'settings', label: 'Settings', type: 'page', icon: <Settings size={18} /> },
+                        { id: 'users', label: 'Users', type: 'page', icon: <Users size={18} /> },
+                        { id: 'analytics', label: 'Analytics', type: 'page', icon: <Activity size={18} /> },
+                    ]}
+                    plugins={[
+                        RecentSearchesPlugin({
+                            maxSearches: 5,
+                            showInResults: true,
+                            icon: <History size={18} className="text-green-500" />
+                        })
+                    ]}
+                    onNavigate={() => { }}
+                >
+                    <SearchTrigger className="w-full max-w-sm" />
+                    <div className="text-xs text-center mt-4 text-slate-600 space-y-1">
+                        <p className="font-semibold">How to test:</p>
+                        <p className="text-slate-400">1. Search for something (e.g., "settings")</p>
+                        <p className="text-slate-400">2. Close and reopen Spotlight</p>
+                        <p className="text-slate-400">3. See your recent searches!</p>
+                    </div>
+                </SpotlightProvider>
+            </Container>
+        );
+    }
+};
+
+// --- Bookmarks Story ---
+export const Bookmarks: Story = {
+    render: () => {
+        return (
+            <Container
+                title="Bookmarks (NEW!)"
+                description="Star your favorite commands"
+            >
+                <SpotlightProvider
+                    items={[
+                        { id: 'home', label: 'Home', type: 'page', icon: <Home size={18} /> },
+                        { id: 'settings', label: 'Settings', type: 'page', icon: <Settings size={18} /> },
+                        { id: 'users', label: 'Users', type: 'page', icon: <Users size={18} /> },
+                        { id: 'analytics', label: 'Analytics', type: 'page', icon: <Activity size={18} /> },
+                    ]}
+                    plugins={[
+                        BookmarksPlugin({
+                            maxBookmarks: 10,
+                            showAtTop: true,
+                            bookmarkIcon: <Star size={18} className="text-yellow-500" />
+                        })
+                    ]}
+                    onNavigate={() => { }}
+                >
+                    <SearchTrigger className="w-full max-w-sm" />
+                    <div className="text-xs text-center mt-4 text-slate-600 space-y-1">
+                        <p className="font-semibold">Features:</p>
+                        <p className="text-slate-400">• Search "manage bookmarks" to view all</p>
+                        <p className="text-slate-400">• Search "clear bookmarks" to reset</p>
+                        <p className="text-slate-400">• Bookmarks persist across sessions</p>
+                    </div>
+                </SpotlightProvider>
+            </Container>
+        );
+    }
+};
+
+// --- Shortcuts Panel Story ---
+export const ShortcutsPanel: Story = {
+    render: () => {
+        return (
+            <Container
+                title="Keyboard Shortcuts Panel (NEW!)"
+                description="Press ? to view all shortcuts"
+            >
+                <SpotlightProvider
+                    items={[
+                        { id: 'home', label: 'Home', type: 'page', icon: <Home size={18} /> },
+                        { id: 'settings', label: 'Settings', type: 'page', icon: <Settings size={18} /> },
+                    ]}
+                    plugins={[
+                        ShortcutsPanelPlugin({
+                            triggerKey: '?',
+                            icon: <Keyboard size={18} className="text-indigo-500" />,
+                            customShortcuts: [
+                                { key: 'Ctrl+B', description: 'Bookmark current item', category: 'Actions' },
+                                { key: 'Ctrl+H', description: 'View history', category: 'Navigation' }
+                            ]
+                        })
+                    ]}
+                    onNavigate={() => { }}
+                >
+                    <SearchTrigger className="w-full max-w-sm" />
+                    <div className="text-xs text-center mt-4 text-slate-600 space-y-1">
+                        <p className="font-semibold">Try it:</p>
+                        <p className="text-slate-400">• Search for "keyboard shortcuts"</p>
+                        <p className="text-slate-400">• Or type <code className="bg-slate-200 px-1 rounded">?</code> to trigger</p>
+                        <p className="text-slate-400">• View all available shortcuts!</p>
+                    </div>
+                </SpotlightProvider>
+            </Container>
+        );
+    }
+};
+
+// --- Command Aliases Story ---
+export const CommandAliases: Story = {
+    render: () => {
+        const itemsWithAliases: SpotlightItem[] = [
+            {
+                id: 'settings',
+                label: 'Settings',
+                aliases: ['preferences', 'config', 'options', 'prefs'],
+                description: 'Try searching: prefs, config, options',
+                type: 'page',
+                icon: <Settings size={18} className="text-blue-500" />
+            },
+            {
+                id: 'users',
+                label: 'Users',
+                aliases: ['people', 'members', 'team'],
+                description: 'Try searching: people, members, team',
+                type: 'page',
+                icon: <Users size={18} className="text-green-500" />
+            },
+            {
+                id: 'home',
+                label: 'Dashboard',
+                aliases: ['home', 'main', 'overview'],
+                description: 'Try searching: home, main, overview',
+                type: 'page',
+                icon: <Home size={18} className="text-purple-500" />
+            },
+        ];
+
+        return (
+            <Container
+                title="Command Aliases (NEW!)"
+                description="Find commands with alternative names"
+            >
+                <SpotlightProvider
+                    items={itemsWithAliases}
+                    onNavigate={() => { }}
+                >
+                    <SearchTrigger className="w-full max-w-sm" />
+                    <div className="text-xs text-center mt-4 text-slate-600 space-y-1">
+                        <p className="font-semibold">Try searching:</p>
+                        <p className="text-slate-400">• <code className="bg-slate-200 px-1 rounded">prefs</code> → finds "Settings"</p>
+                        <p className="text-slate-400">• <code className="bg-slate-200 px-1 rounded">people</code> → finds "Users"</p>
+                        <p className="text-slate-400">• <code className="bg-slate-200 px-1 rounded">home</code> → finds "Dashboard"</p>
+                    </div>
+                </SpotlightProvider>
+            </Container>
+        );
+    }
+};
+
+// --- All New Plugins Combined Story ---
+export const AllNewPlugins: Story = {
+    render: () => {
+        const itemsWithAliases: SpotlightItem[] = [
+            {
+                id: 'settings',
+                label: 'Settings',
+                aliases: ['preferences', 'config', 'options', 'prefs'],
+                type: 'page',
+                icon: <Settings size={18} />
+            },
+            {
+                id: 'users',
+                label: 'Users',
+                aliases: ['people', 'members', 'team'],
+                type: 'page',
+                icon: <Users size={18} />
+            },
+            {
+                id: 'home',
+                label: 'Home',
+                type: 'page',
+                icon: <Home size={18} />
+            },
+        ];
+
+        return (
+            <Container
+                title="All v2.5.0 Plugins Combined!"
+                description="Calculator, Converter, Recent Searches, Bookmarks, Shortcuts & Aliases"
+            >
+                <SpotlightProvider
+                    items={itemsWithAliases}
+                    plugins={[
+                        CalculatorPlugin({ icon: <Calculator size={18} /> }),
+                        UnitConverterPlugin({ icon: <Ruler size={18} /> }),
+                        RecentSearchesPlugin({ icon: <History size={18} /> }),
+                        BookmarksPlugin({ bookmarkIcon: <Star size={18} /> }),
+                        ShortcutsPanelPlugin({ icon: <Keyboard size={18} /> }),
+                    ]}
+                    onNavigate={() => { }}
+                    theme="dark"
+                >
+                    <SearchTrigger className="w-full max-w-sm" />
+                    <div className="text-xs text-center mt-4 text-slate-600 space-y-1">
+                        <p className="font-semibold text-purple-600">🎉 All 5 new features in one!</p>
+                        <p className="text-slate-400">Math: 2+2 | Convert: 100 km to miles | Aliases: prefs</p>
+                    </div>
+                </SpotlightProvider>
             </Container>
         );
     }

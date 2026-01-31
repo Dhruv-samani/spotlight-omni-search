@@ -8,6 +8,10 @@ import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
 import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
 import { CalculatorPlugin } from '../plugins/calculator';
+import { UnitConverterPlugin } from '../plugins/unit-converter';
+import { RecentSearchesPlugin } from '../plugins/recent-searches';
+import { BookmarksPlugin } from '../plugins/bookmarks';
+import { ShortcutsPanelPlugin } from '../plugins/shortcuts-panel';
 import {
     Layout,
     Palette,
@@ -21,7 +25,11 @@ import {
     Shield,
     History,
     Zap,
-    Code
+    Code,
+    Calculator,
+    Ruler,
+    Star,
+    Keyboard
 } from 'lucide-react';
 
 const themes = [
@@ -56,10 +64,10 @@ function App() {
     const [copied, setCopied] = useState(false);
 
     const items: SpotlightItem[] = useMemo(() => [
-        { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation' },
-        { id: '2', label: 'Analytics', type: 'page', group: 'Navigation' },
-        { id: '3', label: 'User Settings', type: 'page', group: 'System' },
-        { id: '4', label: 'Billing & Plans', type: 'page', group: 'System' },
+        { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation', aliases: ['home', 'main', 'overview'] },
+        { id: '2', label: 'Analytics', type: 'page', group: 'Navigation', aliases: ['stats', 'metrics', 'reports'] },
+        { id: '3', label: 'User Settings', type: 'page', group: 'System', aliases: ['preferences', 'config', 'options', 'prefs'] },
+        { id: '4', label: 'Billing & Plans', type: 'page', group: 'System', aliases: ['payment', 'subscription', 'pricing'] },
 
         // Theme Actions
         { id: 'theme-light', label: 'Switch to Light Mode', type: 'action', group: 'Theme', action: () => setTheme('light') },
@@ -105,7 +113,25 @@ function App() {
         CalculatorPlugin({
             enableClipboardCopy: true,
             precision: 10,
-            icon: <Code size={16} /> // Using Lucide icon, but could be any icon library
+            icon: <Calculator size={16} className="text-purple-500" />
+        }),
+        UnitConverterPlugin({
+            enableClipboardCopy: true,
+            icon: <Ruler size={16} className="text-blue-500" />
+        }),
+        RecentSearchesPlugin({
+            maxSearches: 10,
+            showInResults: true,
+            icon: <History size={16} className="text-green-500" />
+        }),
+        BookmarksPlugin({
+            maxBookmarks: 20,
+            showAtTop: true,
+            bookmarkIcon: <Star size={16} className="text-yellow-500" />
+        }),
+        ShortcutsPanelPlugin({
+            triggerKey: '?',
+            icon: <Keyboard size={16} className="text-indigo-500" />
         }),
         AnalyticsPlugin({
             // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
@@ -136,19 +162,50 @@ function App() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    const codeSnippet = `
-<Spotlight
-  isOpen={isOpen}
-  onClose={() => setIsOpen(false)}
-  theme="${theme}"
-  layout="${layout}"
-  debug={${debug}}
-  enableGoogleSearch={${enableGoogle}}
-  enableVimNavigation={${enableVim}}
-  enableRecent={${enableRecent}}
-  headless={${headless}}
-  items={items}
-/>`;
+    const codeSnippet = `import { Spotlight } from 'spotlight-omni-search';
+import { 
+  CalculatorPlugin,
+  UnitConverterPlugin,
+  RecentSearchesPlugin,
+  BookmarksPlugin,
+  ShortcutsPanelPlugin
+} from 'spotlight-omni-search';
+
+function App() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const items = [
+    { 
+      id: '1', 
+      label: 'User Settings', 
+      type: 'page',
+      aliases: ['preferences', 'config', 'prefs']
+    },
+    // ... more items
+  ];
+
+  const plugins = [
+    CalculatorPlugin({ enableClipboardCopy: true }),
+    UnitConverterPlugin({ enableClipboardCopy: true }),
+    RecentSearchesPlugin({ maxSearches: 10 }),
+    BookmarksPlugin({ showAtTop: true }),
+    ShortcutsPanelPlugin({ triggerKey: '?' }),
+  ];
+
+  return (
+    <Spotlight
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      items={items}
+      plugins={plugins}
+      theme="${theme}"
+      layout="${layout}"
+      enableGoogleSearch={${enableGoogle}}
+      enableVimNavigation={${enableVim}}
+      enableRecent={${enableRecent}}
+    />
+  );
+}`;
 
     return (
         <div className={`min-h-screen transition-colors duration-500 ${theme === 'dark' || theme === 'midnight' ? 'dark bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
@@ -161,7 +218,7 @@ function App() {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">Spotlight <span className="gradient-text">Playground</span></h1>
-                            <p className="text-xs opacity-50 font-mono">v2.1.4 Production v.11</p>
+                            <p className="text-xs opacity-50 font-mono">v2.5.0 - 5 New Features! 🎉</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -284,19 +341,27 @@ function App() {
                         </div>
 
                         <div className="glass-card p-8 bg-blue-600/5 border-blue-500/20">
-                            <h3 className="text-sm font-semibold opacity-70 mb-4 uppercase tracking-wider">Quick Highlights</h3>
+                            <h3 className="text-sm font-semibold opacity-70 mb-4 uppercase tracking-wider">✨ New in v2.5.0</h3>
                             <ul className="space-y-4">
                                 <li className="flex items-center gap-3 text-sm">
-                                    <Shield size={16} className="text-emerald-500" />
-                                    <span>Privacy Obfuscation Enabled</span>
+                                    <Calculator size={16} className="text-purple-500" />
+                                    <span><strong>Unit Converter</strong> - 100 km to miles</span>
+                                </li>
+                                <li className="flex items-center gap-3 text-sm">
+                                    <History size={16} className="text-green-500" />
+                                    <span><strong>Recent Searches</strong> - Quick history</span>
+                                </li>
+                                <li className="flex items-center gap-3 text-sm">
+                                    <Star size={16} className="text-yellow-500" />
+                                    <span><strong>Bookmarks</strong> - Save favorites</span>
+                                </li>
+                                <li className="flex items-center gap-3 text-sm">
+                                    <Keyboard size={16} className="text-indigo-500" />
+                                    <span><strong>Shortcuts Panel</strong> - Type ?</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-sm">
                                     <Zap size={16} className="text-amber-500" />
-                                    <span>Adaptive Zero-Lag Filter</span>
-                                </li>
-                                <li className="flex items-center gap-3 text-sm">
-                                    <Monitor size={16} className="text-blue-500" />
-                                    <span>Tailwind-Native Responsive</span>
+                                    <span><strong>Command Aliases</strong> - prefs → Settings</span>
                                 </li>
                             </ul>
                         </div>

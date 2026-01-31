@@ -16,6 +16,11 @@ export interface SpotlightItem {
    * Keywords for fuzzy search
    */
   keywords?: string[];
+  /**
+   * Alternative names/aliases for this item (e.g., ['prefs', 'config'] for 'Settings')
+   * Improves discoverability by matching different user mental models
+   */
+  aliases?: string[];
   disabled?: boolean;
   /**
    * For navigation items
