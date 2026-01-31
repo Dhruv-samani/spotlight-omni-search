@@ -5,6 +5,10 @@ import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
 import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
 import { CalculatorPlugin } from '../plugins/calculator';
+import { UnitConverterPlugin } from '../plugins/unit-converter';
+import { RecentSearchesPlugin } from '../plugins/recent-searches';
+import { BookmarksPlugin } from '../plugins/bookmarks';
+import { ShortcutsPanelPlugin } from '../plugins/shortcuts-panel';
 import { NestedCommandsPlugin } from '../plugins/nested';
 import { VirtualScrollingPlugin } from '../plugins/virtual';
 import '../dev/index.css'; // Import Playground specific styles
@@ -23,7 +27,10 @@ import {
     Copy,
     Check,
     Shield,
-    Folder
+    Folder,
+    Ruler,
+    Star,
+    Keyboard
 } from 'lucide-react';
 
 const meta: Meta = {
@@ -140,12 +147,30 @@ const Playground = () => {
                 precision: 10,
                 icon: <Code size={16} className="text-blue-500" /> // Using Lucide icon
             }),
+            UnitConverterPlugin({
+                enableClipboardCopy: true,
+                icon: <Ruler size={16} className="text-purple-500" />
+            }),
+            RecentSearchesPlugin({
+                maxSearches: 5,
+                showInResults: true,
+                icon: <History size={16} className="text-green-500" />
+            }),
+            BookmarksPlugin({
+                maxBookmarks: 10,
+                showAtTop: true,
+                bookmarkIcon: <Star size={16} className="text-yellow-500" />
+            }),
+            ShortcutsPanelPlugin({
+                triggerKey: '?',
+                icon: <Keyboard size={16} className="text-indigo-500" />
+            }),
             AnalyticsPlugin({
                 // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
                 // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
             }),
             GoogleAnalyticsPlugin({
-                measurementId: 'G-JQXKL5EW07',
+                measurementId: 'G-0CY7THP9QZ',
                 enableDebug: false,
                 loadScript: true,
             })
@@ -205,7 +230,7 @@ const Playground = () => {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">Spotlight <span className="gradient-text">Playground</span></h1>
-                            <p className="text-xs opacity-50 font-mono">v2.4.0 with Calculator</p>
+                            <p className="text-xs opacity-50 font-mono">v2.5.0 - 5 New Features! 🎉</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -326,23 +351,27 @@ const Playground = () => {
                         </div>
 
                         <div className="glass-card p-8 bg-blue-600/5 border-blue-500/20">
-                            <h3 className="text-sm font-semibold opacity-70 mb-4 uppercase tracking-wider">Quick Highlights</h3>
+                            <h3 className="text-sm font-semibold opacity-70 mb-4 uppercase tracking-wider">✨ New in v2.5.0</h3>
                             <ul className="space-y-4">
                                 <li className="flex items-center gap-3 text-sm">
-                                    <Code size={16} className="text-blue-500" />
-                                    <span>Built-in Calculator (Try: 2 + 2)</span>
+                                    <Code size={16} className="text-purple-500" />
+                                    <span><strong>Unit Converter</strong> - 100 km to miles</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-sm">
-                                    <Shield size={16} className="text-emerald-500" />
-                                    <span>Privacy Obfuscation Enabled</span>
+                                    <History size={16} className="text-green-500" />
+                                    <span><strong>Recent Searches</strong> - Quick history</span>
+                                </li>
+                                <li className="flex items-center gap-3 text-sm">
+                                    <Star size={16} className="text-yellow-500" />
+                                    <span><strong>Bookmarks</strong> - Save favorites</span>
+                                </li>
+                                <li className="flex items-center gap-3 text-sm">
+                                    <Keyboard size={16} className="text-indigo-500" />
+                                    <span><strong>Shortcuts Panel</strong> - Type ?</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-sm">
                                     <Zap size={16} className="text-amber-500" />
-                                    <span>Adaptive Zero-Lag Filter</span>
-                                </li>
-                                <li className="flex items-center gap-3 text-sm">
-                                    <Monitor size={16} className="text-blue-500" />
-                                    <span>Tailwind-Native Responsive</span>
+                                    <span><strong>Command Aliases</strong> - prefs → Settings</span>
                                 </li>
                             </ul>
                         </div>
