@@ -12,6 +12,8 @@ import { UnitConverterPlugin } from '../plugins/unit-converter';
 import { RecentSearchesPlugin } from '../plugins/recent-searches';
 import { BookmarksPlugin } from '../plugins/bookmarks';
 import { ShortcutsPanelPlugin } from '../plugins/shortcuts-panel';
+import { MultiSelectDemo } from './MultiSelectDemo';
+import { TagsCategoriesDemo } from './TagsCategoriesDemo';
 import {
     Layout,
     Palette,
@@ -29,7 +31,9 @@ import {
     Calculator,
     Ruler,
     Star,
-    Keyboard
+    Keyboard,
+    CheckSquare,
+    Tag
 } from 'lucide-react';
 
 const themes = [
@@ -62,6 +66,7 @@ function App() {
     const [headless, setHeadless] = useState(false);
     const [useLargeDataset, setUseLargeDataset] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [viewMode, setViewMode] = useState<'playground' | 'multiselect' | 'tags'>('playground');
 
     const items: SpotlightItem[] = useMemo(() => [
         { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation', aliases: ['home', 'main', 'overview'] },
@@ -162,6 +167,27 @@ function App() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    // 🔗 Hash-based routing
+    useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash.slice(1); // Remove #
+            if (hash === 'multiselect') {
+                setViewMode('multiselect');
+            } else if (hash === 'tags') {
+                setViewMode('tags');
+            } else {
+                setViewMode('playground');
+            }
+        };
+
+        // Check initial hash
+        handleHashChange();
+
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
+
     const codeSnippet = `import { Spotlight } from 'spotlight-omni-search';
 import { 
   CalculatorPlugin,
@@ -207,6 +233,16 @@ function App() {
   );
 }`;
 
+    // Show Multi-Select Demo if in that mode
+    if (viewMode === 'multiselect') {
+        return <MultiSelectDemo />;
+    }
+
+    // Show Tags & Categories Demo if in that mode
+    if (viewMode === 'tags') {
+        return <TagsCategoriesDemo />;
+    }
+
     return (
         <div className={`min-h-screen transition-colors duration-500 ${theme === 'dark' || theme === 'midnight' ? 'dark bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
             {/* Header */}
@@ -218,13 +254,24 @@ function App() {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">Spotlight <span className="gradient-text">Playground</span></h1>
-                            <p className="text-xs opacity-50 font-mono">v2.5.0 - 5 New Features! 🎉</p>
+                            <p className="text-xs opacity-50 font-mono">v3.0.0 - The Biggest Update Yet! 🎉</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        {/* <a href="https://github.com/Dhruv-samani/spotlight-omni-search" target="_blank" className="p-2 hover:bg-white/10 rounded-full transition-colors opacity-70 hover:opacity-100">
-                            <Github size={20} />
-                        </a> */}
+                        <button
+                            onClick={() => window.location.hash = 'multiselect'}
+                            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg text-sm font-semibold shadow-lg shadow-purple-500/20 transition-all flex items-center gap-2"
+                        >
+                            <CheckSquare size={16} />
+                            Multi-Select Demo
+                        </button>
+                        <button
+                            onClick={() => window.location.hash = 'tags'}
+                            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2"
+                        >
+                            <Tag size={16} />
+                            Tags & Categories
+                        </button>
                         <button
                             onClick={() => setIsOpen(true)}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full font-medium shadow-xl shadow-blue-600/20 transition-all hover:scale-105 active:scale-95"

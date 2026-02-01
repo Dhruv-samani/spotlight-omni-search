@@ -1,6 +1,6 @@
 {
   "name": "spotlight-omni-search",
-  "version": "2.5.0",
+  "version": "3.0.0",
   "type": "module",
   "description": "⚡ Professional Command Palette (⌘K) for React & Next.js - Tailwind-native, 20+ themes, built-in calculator, unit converter, recent searches, bookmarks, shortcuts panel. Alternative to cmdk/kbar.",
   "main": "./dist/index.umd.js",
@@ -8,7 +8,7 @@
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Dhruv-samani/spotlight-omni-search"
+    "url": "git+https://github.com/Dhruv-samani/spotlight-omni-search.git"
   },
   "homepage": "https://spotlight-omni-search-docs.netlify.app/",
   "bugs": {
@@ -20,7 +20,7 @@
     "README.md"
   ],
   "bin": {
-    "spotlight-init": "./bin/spotlight-init.js"
+    "spotlight-init": "bin/spotlight-init.js"
   },
   "exports": {
     ".": {

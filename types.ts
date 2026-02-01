@@ -46,6 +46,23 @@ export interface SpotlightItem {
    * Child items for nested navigation
    */
   items?: SpotlightItem[];
+  
+  // Tags & Categories
+  /**
+   * Tags for categorizing and filtering items (e.g., ['admin', 'urgent', 'beta'])
+   * Use tag:name syntax to filter (e.g., "tag:admin")
+   */
+  tags?: string[];
+  /**
+   * Category for grouping items (e.g., 'Administration', 'Content')
+   * Used for visual grouping if no group is specified
+   */
+  category?: string;
+  /**
+   * Custom colors for tags (overrides global tagColors)
+   * Format: { 'tagName': '#hexcolor' }
+   */
+  tagColors?: Record<string, string>;
 }
 
 export interface ConfirmationOptions {
@@ -54,6 +71,21 @@ export interface ConfirmationOptions {
   confirmLabel?: string;
   cancelLabel?: string;
   type?: "danger" | "warning" | "info";
+}
+
+export interface MultiSelectAction {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  action: (items: SpotlightItem[]) => void;
+  variant?: 'default' | 'danger';
+}
+
+export interface TagConfig {
+  name: string;
+  color?: string;           // Hex color or CSS color
+  icon?: ReactNode;
+  description?: string;
 }
 
 export interface SpotlightToast {
@@ -207,6 +239,38 @@ export interface SpotlightProps {
    * @default false
    */
   debug?: boolean;
+
+  // Multi-Select Mode
+  /**
+   * Enable multi-select mode
+   * @default false
+   */
+  multiSelect?: boolean;
+  /**
+   * Callback when items are selected in multi-select mode
+   */
+  onMultiSelect?: (items: SpotlightItem[]) => void;
+  /**
+   * Bulk actions available in multi-select mode
+   */
+  multiSelectActions?: MultiSelectAction[];
+
+  // Tags & Categories
+  /**
+   * Global tag colors (can be overridden per item)
+   * Format: { 'tagName': '#hexcolor' }
+   */
+  tagColors?: Record<string, string>;
+  /**
+   * Show tag badges on items
+   * @default true
+   */
+  showTags?: boolean;
+  /**
+   * Prefix for tag filtering in search
+   * @default 'tag:'
+   */
+  tagFilterPrefix?: string;
 
   /**
    * Callback for internal event logging (analytics, debugging)

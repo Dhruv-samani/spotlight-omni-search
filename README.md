@@ -130,6 +130,404 @@ function App() {
 
 ---
 
+## 🎨 Ready-to-Use Templates
+
+Get started in **30 seconds** with pre-configured templates! Perfect for common use cases.
+
+### SaaS Dashboard Template
+
+Pre-configured for SaaS applications with navigation, quick actions, billing, and all v2.5.0 plugins.
+
+```tsx
+import { SaaSDashboardTemplate } from "spotlight-omni-search";
+
+function App() {
+  return (
+    <SpotlightProvider {...SaaSDashboardTemplate}>
+      <SearchTrigger />
+    </SpotlightProvider>
+  );
+}
+```
+
+**Includes:**
+
+- Navigation (Dashboard, Analytics, Users, Settings)
+- Quick Actions (New Project, Invite User, Export Data)
+- Billing & Subscription
+- Theme Switcher
+- All v2.5.0 plugins (Calculator, Unit Converter, Recent Searches, Bookmarks, Shortcuts Panel)
+
+### Documentation Site Template
+
+Perfect for documentation websites with guides, API reference, and examples.
+
+```tsx
+import { DocsTemplate } from "spotlight-omni-search";
+
+function App() {
+  return (
+    <SpotlightProvider {...DocsTemplate}>
+      <SearchTrigger />
+    </SpotlightProvider>
+  );
+}
+```
+
+**Includes:**
+
+- Documentation (Getting Started, API Reference, Guides, Components)
+- Examples & Playground
+- Community Links (GitHub, Discord)
+- Version Switcher
+- Calculator, Unit Converter, Shortcuts Panel
+
+### Admin Panel Template
+
+Comprehensive admin dashboard with user management and system controls.
+
+```tsx
+import { AdminPanelTemplate } from "spotlight-omni-search";
+
+function App() {
+  return (
+    <SpotlightProvider {...AdminPanelTemplate}>
+      <SearchTrigger />
+    </SpotlightProvider>
+  );
+}
+```
+
+**Includes:**
+
+- User Management (Users, Roles, Permissions)
+- System Settings (Config, Logs, Monitoring)
+- Analytics & Reports
+- Database Management
+- Danger Zone (with confirmations)
+- All plugins enabled
+
+### Customizing Templates
+
+Templates are just configuration objects. Customize them easily:
+
+```tsx
+import { SaaSDashboardTemplate } from "spotlight-omni-search";
+
+const customTemplate = {
+  ...SaaSDashboardTemplate,
+  theme: "violet", // Change theme
+  items: [
+    ...SaaSDashboardTemplate.items,
+    { id: "custom", label: "My Custom Action", type: "action" },
+  ],
+};
+
+<SpotlightProvider {...customTemplate}>
+  <SearchTrigger />
+</SpotlightProvider>;
+```
+
+---
+
+## 📁 File Search Plugin
+
+Search for files in your project with fuzzy matching, file icons, and metadata.
+
+### Basic Usage
+
+```tsx
+import { FileSearchPlugin } from "spotlight-omni-search";
+
+const files = [
+  { id: "1", path: "/src/App.tsx", name: "App.tsx", extension: "tsx" },
+  {
+    id: "2",
+    path: "/src/components/Button.tsx",
+    name: "Button.tsx",
+    extension: "tsx",
+  },
+];
+
+<SpotlightProvider
+  items={items}
+  plugins={[
+    FileSearchPlugin({
+      files,
+      onFileSelect: (file) => openFile(file.path),
+    }),
+  ]}
+>
+  <SearchTrigger />
+</SpotlightProvider>;
+```
+
+**Usage:** Type `@` to activate file search, then type your query (e.g., `@app` to find App.tsx).
+
+### Features
+
+- **Trigger Prefix**: Type `@` to activate file search mode
+- **Fuzzy Matching**: Matches file names, paths, and directories
+- **File Icons**: Automatic icons based on file extension (20+ types)
+- **Metadata**: Shows file size and last modified date
+- **Recent Files**: Tracks recently opened files
+- **Async Search**: Supports dynamic file loading from APIs
+
+### With Metadata
+
+```tsx
+FileSearchPlugin({
+  files,
+  showMetadata: true, // Show size and date
+  showIcons: true, // Show file type icons
+  onFileSelect: (file) => console.log("Open:", file.path),
+});
+```
+
+### Async File Search
+
+```tsx
+FileSearchPlugin({
+  onSearch: async (query) => {
+    const response = await fetch(`/api/files?q=${query}`);
+    return await response.json(); // Returns FileItem[]
+  },
+  triggerPrefix: "@",
+  maxResults: 10,
+});
+```
+
+### File Icons
+
+Supported file types with automatic icons:
+
+- **Code**: `.ts`, `.tsx`, `.js`, `.jsx`, `.py`, `.java`, `.cpp`
+- **Styles**: `.css`, `.scss`, `.sass`, `.less`
+- **Config**: `.json`, `.yaml`, `.yml`, `.xml`
+- **Docs**: `.md`, `.mdx`, `.txt`, `.pdf`
+- **Images**: `.png`, `.jpg`, `.svg`, `.gif`, `.webp`
+
+---
+
+## 🎯 Multi-Select Mode (Coming in v3.0.0)
+
+Select multiple items and perform bulk actions - perfect for admin panels and file managers.
+
+> **Note:** Multi-Select Mode is currently in development and will be available in v3.0.0. The API is finalized and ready to use.
+
+### Planned Features
+
+- ✅ Checkbox UI (visible on hover/selection)
+- ✅ Ctrl/Cmd + Click to toggle selection
+- ✅ Select All / Deselect All buttons
+- ✅ Bulk action toolbar
+- ✅ Custom bulk actions
+- ✅ Keyboard shortcuts (Ctrl+A, Escape)
+
+### Intended API
+
+```tsx
+import { SpotlightProvider } from "spotlight-omni-search";
+
+<SpotlightProvider
+  items={items}
+  multiSelect={true}
+  onMultiSelect={(selectedItems) => {
+    console.log("Selected:", selectedItems);
+  }}
+>
+  <SearchTrigger />
+</SpotlightProvider>;
+```
+
+### With Bulk Actions
+
+```tsx
+const bulkActions = [
+  {
+    id: "delete",
+    label: "Delete Selected",
+    icon: <Trash size={16} />,
+    variant: "danger",
+    action: (items) => {
+      console.log("Deleting:", items);
+      deleteItems(items);
+    },
+  },
+  {
+    id: "export",
+    label: "Export Selected",
+    icon: <Download size={16} />,
+    action: (items) => {
+      exportItems(items);
+    },
+  },
+];
+
+<SpotlightProvider
+  items={items}
+  multiSelect={true}
+  multiSelectActions={bulkActions}
+>
+  <SearchTrigger />
+</SpotlightProvider>;
+```
+
+### Keyboard Shortcuts
+
+- **Ctrl/Cmd + Click**: Toggle item selection
+- **Ctrl/Cmd + A**: Select all visible items
+- **Escape**: Clear selection
+
+---
+
+## 🏷️ Tags & Categories
+
+Organize and filter items using tags and categories for better discoverability in large datasets.
+
+### Basic Usage
+
+```tsx
+const items: SpotlightItem[] = [
+  {
+    id: "1",
+    label: "User Management",
+    description: "Manage users and permissions",
+    type: "page",
+    category: "Administration",
+    tags: ["admin", "users", "security"],
+  },
+  {
+    id: "2",
+    label: "Create Post",
+    description: "Write a new blog post",
+    type: "action",
+    category: "Content",
+    tags: ["content", "editor", "new"],
+  },
+];
+
+<SpotlightProvider items={items}>
+  <SearchTrigger />
+</SpotlightProvider>;
+```
+
+### Tag Filtering
+
+Use the `tag:` prefix to filter items by tags:
+
+```tsx
+// User searches: "tag:admin"
+// Shows only items with 'admin' tag
+
+// User searches: "tag:admin tag:urgent"
+// Shows items with BOTH 'admin' AND 'urgent' tags
+
+// User searches: "user tag:admin"
+// Shows items containing "user" AND tagged with 'admin'
+```
+
+### Custom Tag Colors
+
+```tsx
+const tagColors = {
+  admin: "#8b5cf6", // purple
+  urgent: "#ef4444", // red
+  beta: "#ec4899", // pink
+  new: "#14b8a6", // teal
+};
+
+<SpotlightProvider
+  items={items}
+  tagColors={tagColors}
+  showTags={true}
+  tagFilterPrefix="tag:" // default
+>
+  <SearchTrigger />
+</SpotlightProvider>;
+```
+
+### Per-Item Tag Colors
+
+```tsx
+const items: SpotlightItem[] = [
+  {
+    id: "1",
+    label: "Critical Alert",
+    tags: ["urgent", "security"],
+    tagColors: {
+      urgent: "#dc2626", // custom red for this item
+    },
+  },
+];
+```
+
+### Category Grouping
+
+Categories are used for visual grouping in the results:
+
+```tsx
+const items: SpotlightItem[] = [
+  {
+    id: "1",
+    label: "User Settings",
+    category: "Administration",
+    tags: ["admin"],
+  },
+  {
+    id: "2",
+    label: "Role Management",
+    category: "Administration",
+    tags: ["admin"],
+  },
+  { id: "3", label: "Create Post", category: "Content", tags: ["content"] },
+  { id: "4", label: "Media Library", category: "Content", tags: ["content"] },
+];
+```
+
+Results will be grouped by category:
+
+```
+Administration
+  - User Settings [admin]
+  - Role Management [admin]
+
+Content
+  - Create Post [content]
+  - Media Library [content]
+```
+
+### Tag Filtering Examples
+
+| Search Query                      | Result                                          |
+| --------------------------------- | ----------------------------------------------- |
+| `tag:admin`                       | All items with 'admin' tag                      |
+| `tag:admin tag:urgent`            | Items with BOTH tags (AND logic)                |
+| `user tag:admin`                  | Items containing "user" AND tagged with 'admin' |
+| `tag:beta`                        | All beta features                               |
+| `settings tag:admin tag:security` | "settings" + admin + security tags              |
+
+### Configuration Options
+
+```tsx
+<SpotlightProvider
+  items={items}
+  // Global tag colors
+  tagColors={{
+    admin: "#8b5cf6",
+    urgent: "#ef4444",
+  }}
+  // Show/hide tag badges
+  showTags={true} // default: true
+  // Custom tag filter prefix
+  tagFilterPrefix="tag:" // default: 'tag:'
+>
+  <SearchTrigger />
+</SpotlightProvider>
+```
+
+---
+
 ## 🧩 Advanced Usage
 
 ### Asynchronous Search (APIs)

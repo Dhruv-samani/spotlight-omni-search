@@ -24,6 +24,8 @@ export type {
   SpotlightItem,
   SpotlightItemType,
   KeyboardShortcuts,
+  MultiSelectAction,
+  TagConfig,
 } from "./types";
 
 // Utilities
@@ -51,6 +53,12 @@ export { RecentSearchesPlugin, type RecentSearchesOptions } from "./plugins/rece
 export { UnitConverterPlugin, type UnitConverterOptions } from "./plugins/unit-converter";
 export { BookmarksPlugin, type BookmarksOptions, isBookmarked } from "./plugins/bookmarks";
 export { ShortcutsPanelPlugin, type ShortcutsPanelOptions, type KeyboardShortcut, getKeyboardShortcuts } from "./plugins/shortcuts-panel";
+export { FileSearchPlugin, type FileSearchOptions, type FileItem } from "./plugins/file-search";
+
+// Templates (v3.0.0+)
+export { SaaSDashboardTemplate } from "./templates/saas-dashboard";
+export { DocsTemplate } from "./templates/docs-site";
+export { AdminPanelTemplate } from "./templates/admin-panel";
 
 // Existing exports not explicitly modified but still needed
 export * from "./adapters/routes";

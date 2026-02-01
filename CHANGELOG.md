@@ -5,113 +5,127 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.4.0] - 2026-01-18
+## [3.0.0] - 2026-02-01
+
+### 🎉 Major Features
+
+This is the **biggest update yet** with 4 major new features!
+
+#### 1. Command Palette Templates
+
+Pre-built templates for instant setup:
+
+- **SaaS Dashboard Template** - Complete command palette for SaaS applications
+- **Documentation Site Template** - Perfect for docs sites with search
+- **Admin Panel Template** - Full-featured admin dashboard commands
+
+Get started in 30 seconds with ready-to-use templates!
+
+#### 2. Fuzzy File Search Plugin
+
+VSCode-style file search built-in:
+
+- Fuzzy matching on file paths
+- File icons and metadata (size, last modified)
+- Trigger with `@` prefix
+- Customizable file selection handler
+
+#### 3. Multi-Select Mode
+
+Bulk actions made easy:
+
+- Click to select multiple items
+- Select All / Deselect All functionality
+- Custom bulk actions support
+- Visual feedback with checkboxes
+- Action confirmation messages
+
+#### 4. Tags & Categories System
+
+Advanced filtering and organization:
+
+- Tag-based filtering with `tag:name` syntax
+- Visual tag badges with custom colors
+- Category-based grouping
+- Combined tag filtering (AND logic)
+- Per-item and global tag color customization
 
 ### Added
 
-- **🧮 Calculator Plugin**: Built-in math expression evaluator
-  - Safe evaluation using Function constructor with strict validation
-  - Supports operators: `+`, `-`, `*`, `/`, `%`, `^` (exponentiation)
-  - Auto-copy results to clipboard
-  - Configurable decimal precision
-  - Security: Blocks dangerous patterns (function calls, object access, etc.)
-- **🎭 Icon Flexibility**: Icons are now completely optional
-  - Support for ANY icon library (Lucide, Material Icons, Heroicons, Font Awesome, etc.)
-  - Support for custom SVG files from assets
-  - Support for inline SVG elements
-  - Support for emoji or plain text
-  - Option to use no icons at all
-- **📚 Documentation**: Added comprehensive `docs/ICONS.md` guide with examples for all major icon libraries
-- **✨ UI/UX Polish**:
-  - Enhanced footer with visual `<kbd>` keyboard shortcuts
-  - Smooth animation keyframes (`spotlight-fade-in`, `spotlight-scale-in`, `spotlight-slide-down`)
-  - Better spacing and organization
-  - Conditional Vim navigation hints in footer
+- `SaaSDashboardTemplate` - Pre-built template for SaaS apps
+- `DocsTemplate` - Pre-built template for documentation sites
+- `AdminPanelTemplate` - Pre-built template for admin panels
+- `FileSearchPlugin` - File search with fuzzy matching
+- `multiSelect` prop to enable multi-select mode
+- `onMultiSelect` callback for bulk actions
+- `multiSelectActions` prop for custom bulk actions
+- `MultiSelectAction` type export
+- `tags` field to `SpotlightItem` type
+- `category` field to `SpotlightItem` type
+- `tagColors` field to `SpotlightItem` type (per-item)
+- `tagColors` prop to `SpotlightProps` (global)
+- `showTags` prop to control tag badge visibility
+- `tagFilterPrefix` prop for custom tag filter syntax
+- `TagConfig` type export
+- Multi-Select demo in dev playground (`#multiselect`)
+- Tags & Categories demo in dev playground (`#tags`)
 
 ### Changed
 
-- **Breaking**: `lucide-react` is no longer a required peer dependency (now optional)
-- Updated `package.json` to mark `lucide-react` as optional via `peerDependenciesMeta`
-- Updated README to reflect optional icons and showcase Calculator plugin
-- Package description now mentions "Built-in Calculator"
+- Updated README with comprehensive documentation for all new features
+- Enhanced Storybook with new stories for templates, file search, multi-select, and tags
+- Improved dev playground with hash-based routing for demos
 
-### Fixed
+### Documentation
 
-- Calculator plugin no longer forces users to install `lucide-react`
-- Icons can now be customized per plugin/item without library restrictions
+- Added Command Palette Templates section to README
+- Added File Search Plugin section to README
+- Added Multi-Select Mode section to README
+- Added Tags & Categories section to README
+- Created comprehensive Storybook stories for all new features
+- Added interactive demos in dev playground
 
-## [2.3.2] - Previous Release
+---
 
-### Features
+## [2.5.0] - 2025-01-XX
 
-- SpotlightProvider simplified API
-- SearchTrigger component
-- Virtual scrolling for large datasets
-- 20+ built-in themes
+### Added
+
+- Recent Searches Plugin - Track and display search history
+- Unit Converter Plugin - Convert units (length, weight, temperature, currency)
+- Bookmarks Plugin - Bookmark favorite commands
+- Shortcuts Panel Plugin - Display keyboard shortcuts
+- Command aliases support - Multiple names for same command
+
+### Changed
+
+- Improved fuzzy search algorithm
+- Enhanced keyboard navigation
+- Better mobile responsiveness
+
+---
+
+## [2.0.0] - 2024-XX-XX
+
+### Added
+
+- Initial public release
+- 20+ pre-built themes
+- Calculator plugin
+- Virtual scrolling
 - Async search support
-- Privacy obfuscation for localStorage
-- Full keyboard navigation
-- Vim navigation support
-- Undo/Redo for search queries
-- Confirmation dialogs for destructive actions
-- Command arguments support
-- Google Analytics plugin
+- Nested commands
 - Analytics plugin
+- Google Analytics integration
+- TypeScript support
+- Keyboard navigation
+- Confirmation dialogs
+- Recent items tracking
 
 ---
 
-## Migration Guide: v2.3.2 → v2.4.0
+## Links
 
-### Icons (Optional Breaking Change)
-
-If you were relying on default icons, you now need to explicitly provide them:
-
-**Before (v2.3.2):**
-
-```tsx
-CalculatorPlugin(); // Used Lucide icons automatically
-```
-
-**After (v2.4.0):**
-
-```tsx
-// Option 1: Add Lucide icon explicitly
-import { Calculator } from "lucide-react";
-CalculatorPlugin({ icon: <Calculator size={16} /> });
-
-// Option 2: Use your preferred library
-import CalculateIcon from "@mui/icons-material/Calculate";
-CalculatorPlugin({ icon: <CalculateIcon fontSize="small" /> });
-
-// Option 3: No icon
-CalculatorPlugin(); // Works fine without icon!
-```
-
-### Installation
-
-**Before:**
-
-```bash
-npm install spotlight-omni-search lucide-react
-```
-
-**After:**
-
-```bash
-npm install spotlight-omni-search
-# Optional: Install your preferred icon library
-npm install lucide-react
-# OR
-npm install @mui/icons-material
-# OR use custom SVGs
-```
-
----
-
-## Upgrade Instructions
-
-```bash
-npm install spotlight-omni-search@latest
-```
-
-If you use icons, ensure you have your preferred icon library installed. See [docs/ICONS.md](docs/ICONS.md) for examples.
+- [GitHub Repository](https://github.com/Dhruv-samani/spotlight-omni-search)
+- [NPM Package](https://www.npmjs.com/package/spotlight-omni-search)
+- [Documentation](https://spotlight-omni-search-docs.netlify.app/)
