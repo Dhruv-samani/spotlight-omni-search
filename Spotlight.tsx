@@ -82,6 +82,7 @@ export function Spotlight({
     enableVirtualScrolling = 'auto',
     virtualScrollThreshold = 500,
     virtualScrollOverscan = 5,
+    enableAutocomplete = false,
 }: SpotlightProps) {
     // Helper to merge classes based on headless mode
     const mergeClasses = useCallback((defaultClasses: string, customKey?: keyof import('./types').SpotlightClassNames, ...moreClasses: (string | undefined | null | false)[]) => {
@@ -687,7 +688,32 @@ export function Spotlight({
             handlePageDown();
         } else if (key === 'Enter') {
             e.preventDefault();
+            // If autocomplete is enabled and we have a ghost text match, and user hits Enter
+            // We could optionally autocomplete? But standard is Tab. 
+            // VS Code: Enter selects the item. 
+            // So default behavior is correct (selects selectedIndex).
             handleSelect();
+        } else if (key === 'Tab') {
+            if (enableAutocomplete && query && filteredItems.length > 0) {
+                const bestMatch = filteredItems[0].item.label; // Assuming first item is best match
+                if (bestMatch.toLowerCase().startsWith(query.toLowerCase()) && query.toLowerCase() !== bestMatch.toLowerCase()) {
+                    e.preventDefault();
+                    // Maintain casing of the item, but keep what user typed? 
+                    // Usually autocomplete replaces with full item text.
+                    setQuery(bestMatch);
+                    return;
+                }
+            }
+            // Fallback to default Tab behavior (Next Group) handled by useKeyboardShortcuts
+            // We don't preventDefault here so it bubbles to hook?
+            // Hook is attached via window/document listener or ... No, hook attaches by itself.
+            // But valid keydown on input stops propagation? 
+            // useKeyboardShortcuts attaches to window. 
+            // if we don't preventDefault, it might bubble. 
+            // Actually `handleKeyDown` in `useKeyboardShortcuts` is manual if we want input specific override.
+            // But here we are in `handleInputKeyDown`.
+            // We should call `handleKeyDown(e)` if we don't handle it.
+            handleKeyDown(e);
         } else if (key === 'ArrowUp') {
             e.preventDefault();
             handleUp();
@@ -695,10 +721,10 @@ export function Spotlight({
             e.preventDefault();
             handleDown();
         } else {
-            // Let hook handle others (Escape, Tab, etc.)
+            // Let hook handle others (Escape, etc.)
             handleKeyDown(e);
         }
-    }, [query, redoStack, undoStack, handlePageUp, handlePageDown, handleSelect, handleUp, handleDown, handleKeyDown, logEvent]);
+    }, [query, redoStack, undoStack, handlePageUp, handlePageDown, handleSelect, handleUp, handleDown, handleKeyDown, logEvent, enableAutocomplete, filteredItems]);
 
     const toggleRegexMode = useCallback(() => {
         setRegexMode(prev => !prev);
@@ -735,23 +761,39 @@ export function Spotlight({
                     const defaultHeader = (
                         <div className={mergeClasses("flex items-center gap-3 px-4 py-3 border-b border-border z-[999] relative", 'header', headerClassName)}>
                             <Search className={mergeClasses("w-5 h-5 text-muted-foreground", 'searchIcon')} aria-hidden="true" />
-                            <input
-                                ref={inputRef}
-                                id={inputId}
-                                type="text"
-                                value={query}
-                                onChange={handleQueryChange}
-                                placeholder={searchPlaceholder}
-                                className={mergeClasses("flex-1 bg-transparent border-none outline-none text-base placeholder:text-muted-foreground", 'input')}
-                                autoFocus
-                                role="combobox"
-                                aria-autocomplete="list"
-                                aria-expanded={true}
-                                aria-controls={listId}
-                                aria-activedescendant={filteredItems[selectedIndex] ? `${listId}-item-${selectedIndex}` : undefined}
-                                onKeyDown={handleInputKeyDown}
-                                style={{ color: 'var(--spotlight-foreground)' }}
-                            />
+
+                            <div className="relative flex-1">
+                                {enableAutocomplete && query && filteredItems.length > 0 && filteredItems[0].item.label.toLowerCase().startsWith(query.toLowerCase()) && (
+                                    <div
+                                        className="absolute inset-0 flex items-center pointer-events-none"
+                                        aria-hidden="true"
+                                    >
+                                        {/* Invisible text to push the ghost text to the right position */}
+                                        <span className="invisible whitespace-pre">{query}</span>
+                                        {/* Ghost text suffix */}
+                                        <span style={{ color: 'var(--spotlight-muted-foreground)', opacity: 0.5 }} className="whitespace-pre">
+                                            {filteredItems[0].item.label.substring(query.length)}
+                                        </span>
+                                    </div>
+                                )}
+                                <input
+                                    ref={inputRef}
+                                    id={inputId}
+                                    type="text"
+                                    value={query}
+                                    onChange={handleQueryChange}
+                                    placeholder={searchPlaceholder}
+                                    className={mergeClasses("w-full bg-transparent border-none outline-none text-base placeholder:text-muted-foreground relative z-10", 'input')}
+                                    autoFocus
+                                    role="combobox"
+                                    aria-autocomplete="list"
+                                    aria-expanded={true}
+                                    aria-controls={listId}
+                                    aria-activedescendant={filteredItems[selectedIndex] ? `${listId}-item-${selectedIndex}` : undefined}
+                                    onKeyDown={handleInputKeyDown}
+                                    style={{ color: 'var(--spotlight-foreground)' }}
+                                />
+                            </div>
                         </div>
                     );
 

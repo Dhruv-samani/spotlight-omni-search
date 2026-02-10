@@ -99,6 +99,8 @@ export const ShortcutsPanelPlugin = (options: ShortcutsPanelOptions = {}): Spotl
               description: shortcut.description,
               type: 'info',
               group: category,
+              // Add trigger key as keyword so it matches the search
+              keywords: [triggerKey],
               // No action - these are informational only
             });
           });
@@ -106,8 +108,8 @@ export const ShortcutsPanelPlugin = (options: ShortcutsPanelOptions = {}): Spotl
 
         lastShortcuts = shortcutItems;
         
-        // Return empty items - we'll add shortcuts in onAfterSearch
-        return [];
+        // Return valid items directly
+        return shortcutItems;
       }
 
       // Reset shortcuts if not trigger
@@ -129,6 +131,7 @@ export const ShortcutsPanelPlugin = (options: ShortcutsPanelOptions = {}): Spotl
             pluginContext.setQuery(triggerKey);
           }
         },
+        preventClose: true,
       };
 
       return [shortcutsCommand, ...items];

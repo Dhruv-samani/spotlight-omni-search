@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import '../index.css'; // Library CSS variables
-import { Spotlight } from '../Spotlight';
+import { Spotlight } from '../components/Spotlight';
 import { SpotlightItem, SpotlightLayout } from '../types';
 import { AnalyticsPlugin } from '../plugins/analytics';
 import { GoogleAnalyticsPlugin } from '../plugins/google-analytics';
@@ -14,17 +14,16 @@ import { BookmarksPlugin } from '../plugins/bookmarks';
 import { ShortcutsPanelPlugin } from '../plugins/shortcuts-panel';
 import { MultiSelectDemo } from './MultiSelectDemo';
 import { TagsCategoriesDemo } from './TagsCategoriesDemo';
+import { CommandDemo } from './CommandDemo';
+
 import {
     Layout,
     Palette,
     Settings,
     Monitor,
     Smartphone,
-    Github,
-    ExternalLink,
     Copy,
     Check,
-    Shield,
     History,
     Zap,
     Code,
@@ -32,8 +31,6 @@ import {
     Ruler,
     Star,
     Keyboard,
-    CheckSquare,
-    Tag
 } from 'lucide-react';
 
 const themes = [
@@ -57,16 +54,16 @@ const layouts: { id: SpotlightLayout; name: string; description: string }[] = [
 
 function App() {
     const [isOpen, setIsOpen] = useState(false);
-    const [theme, setTheme] = useState<string>('dark');
+    const [theme, setTheme] = useState('zinc');
     const [layout, setLayout] = useState<SpotlightLayout>('center');
     const [debug, setDebug] = useState(false);
     const [enableGoogle, setEnableGoogle] = useState(true);
-    const [enableVim, setEnableVim] = useState(false);
     const [enableRecent, setEnableRecent] = useState(true);
+    const [enableAutocomplete, setEnableAutocomplete] = useState(true);
     const [headless, setHeadless] = useState(false);
     const [useLargeDataset, setUseLargeDataset] = useState(false);
     const [copied, setCopied] = useState(false);
-    const [viewMode, setViewMode] = useState<'playground' | 'multiselect' | 'tags'>('playground');
+    const [viewMode, setViewMode] = useState<'playground' | 'multiselect' | 'tags' | 'command-demo'>('playground');
 
     const items: SpotlightItem[] = useMemo(() => [
         { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation', aliases: ['home', 'main', 'overview'] },
@@ -83,7 +80,7 @@ function App() {
         { id: 'theme-amber', label: 'Switch to Amber Theme', type: 'action', group: 'Theme', action: () => setTheme('amber') },
         { id: 'theme-midnight', label: 'Switch to Midnight Theme', type: 'action', group: 'Theme', action: () => setTheme('midnight') },
 
-        { id: '6', label: 'Google Recent News', type: 'action', group: 'External', action: (args?: string) => window.open(`https://google.com/search?q=\${args}`) },
+        { id: '6', label: 'Google Recent News', type: 'action', group: 'External', action: (args?: string) => window.open(`https://google.com/search?q=${args}`) },
         {
             id: '7',
             label: 'Delete User Profile',
@@ -142,11 +139,6 @@ function App() {
             // onSelect: (id, type) => console.log(`[Analytics] Selected ${id} (${type})`),
             // onSearch: (q) => console.log(`[Analytics] Searched for: ${q}`)
         }),
-        GoogleAnalyticsPlugin({
-            measurementId: import.meta.env.VITE_GA_MEASUREMENT_ID || '',
-            enableDebug: false,
-            loadScript: !!import.meta.env.VITE_GA_MEASUREMENT_ID,
-        })
     ], []);
 
     const handleCopy = () => {
@@ -175,6 +167,8 @@ function App() {
                 setViewMode('multiselect');
             } else if (hash === 'tags') {
                 setViewMode('tags');
+            } else if (hash === 'command-demo') {
+                setViewMode('command-demo');
             } else {
                 setViewMode('playground');
             }
@@ -227,8 +221,8 @@ function App() {
       theme="${theme}"
       layout="${layout}"
       enableGoogleSearch={${enableGoogle}}
-      enableVimNavigation={${enableVim}}
       enableRecent={${enableRecent}}
+      enableAutocomplete={${enableAutocomplete}}
     />
   );
 }`;
@@ -243,6 +237,23 @@ function App() {
         return <TagsCategoriesDemo />;
     }
 
+    // Show Command Demo if in that mode
+    if (viewMode === 'command-demo') {
+        return <CommandDemo />;
+    }
+
+    const [enableAi, setEnableAi] = useState(false);
+
+    const interactionFeatures = [
+        { id: 'debug', label: 'Debug Mode', desc: 'Display search scores and latency', icon: <Monitor size={18} />, value: debug, setter: setDebug },
+        { id: 'google', label: 'Google Search', desc: 'Allow direct web search fallback', icon: <Smartphone size={18} />, value: enableGoogle, setter: setEnableGoogle },
+        { id: 'history', label: 'Record History', desc: 'Persist search queries locally', icon: <History size={18} />, value: enableRecent, setter: setEnableRecent },
+        { id: 'autocomplete', label: 'Autocomplete', desc: 'Show ghost text and allow Tab completion', icon: <Code size={18} />, value: enableAutocomplete, setter: setEnableAutocomplete },
+        { id: 'ai', label: 'AI Search', desc: 'Simulate AI intent detection', icon: <Zap size={18} />, value: enableAi, setter: setEnableAi },
+        { id: 'headless', label: 'Headless Mode', desc: 'Remove default styling (bring your own CSS)', icon: <Code size={18} />, value: headless, setter: setHeadless },
+        { id: 'largedata', label: 'Large Dataset', desc: 'Test virtual scrolling (1000 items)', icon: <Monitor size={18} />, value: useLargeDataset, setter: setUseLargeDataset },
+    ];
+
     return (
         <div className={`min-h-screen transition-colors duration-500 ${theme === 'dark' || theme === 'midnight' ? 'dark bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
             {/* Header */}
@@ -254,24 +265,10 @@ function App() {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">Spotlight <span className="gradient-text">Playground</span></h1>
-                            <p className="text-xs opacity-50 font-mono">v3.0.0 - The Biggest Update Yet! 🎉</p>
+                            <p className="text-xs opacity-50 font-mono">Interactive Demo & Testing Environment</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => window.location.hash = 'multiselect'}
-                            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg text-sm font-semibold shadow-lg shadow-purple-500/20 transition-all flex items-center gap-2"
-                        >
-                            <CheckSquare size={16} />
-                            Multi-Select Demo
-                        </button>
-                        <button
-                            onClick={() => window.location.hash = 'tags'}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2"
-                        >
-                            <Tag size={16} />
-                            Tags & Categories
-                        </button>
                         <button
                             onClick={() => setIsOpen(true)}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full font-medium shadow-xl shadow-blue-600/20 transition-all hover:scale-105 active:scale-95"
@@ -333,14 +330,7 @@ function App() {
                                 <h2 className="text-lg font-semibold">Interaction Logic</h2>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {[
-                                    { id: 'debug', label: 'Debug Mode', desc: 'Display search scores and latency', icon: <Monitor size={18} />, value: debug, setter: setDebug },
-                                    { id: 'google', label: 'Google Search', desc: 'Allow direct web search fallback', icon: <Smartphone size={18} />, value: enableGoogle, setter: setEnableGoogle },
-                                    { id: 'history', label: 'Record History', desc: 'Persist search queries locally', icon: <History size={18} />, value: enableRecent, setter: setEnableRecent },
-                                    { id: 'vim', label: 'Vim Navigation', desc: 'Support h, j, k, l movement', icon: <Zap size={18} />, value: enableVim, setter: setEnableVim },
-                                    { id: 'headless', label: 'Headless Mode', desc: 'Remove default styling (bring your own CSS)', icon: <Code size={18} />, value: headless, setter: setHeadless },
-                                    { id: 'largedata', label: 'Large Dataset (1000 items)', desc: 'Test virtual scrolling performance', icon: <Monitor size={18} />, value: useLargeDataset, setter: setUseLargeDataset },
-                                ].map((f) => (
+                                {interactionFeatures.map((f) => (
                                     <div key={f.id} className="glass-card p-6 flex items-start justify-between">
                                         <div className="flex items-start gap-4">
                                             <div className="p-2 bg-slate-500/10 rounded-lg text-slate-500 mt-1">
@@ -427,20 +417,30 @@ function App() {
                 layout={layout}
                 debug={debug}
                 enableGoogleSearch={enableGoogle}
-                enableVimNavigation={enableVim}
                 enableRecent={enableRecent}
                 headless={headless}
-                classNames={headless ? {
-                    backdrop: 'fixed inset-0 bg-black/50',
-                    container: 'bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl mx-auto mt-20 p-4',
-                    header: 'flex items-center gap-2 mb-4',
-                    input: 'w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg',
-                    listContainer: 'max-h-96 overflow-y-auto',
-                    item: 'px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded',
-                    itemSelected: 'px-4 py-2 bg-blue-500 text-white cursor-pointer rounded',
-                } : undefined}
                 items={activeItems}
                 plugins={plugins}
+                enableVirtualScrolling={useLargeDataset}
+                virtualScrollThreshold={20}
+                enableAutocomplete={enableAutocomplete}
+                enableAi={enableAi}
+            /* 
+            // EXAMPLE: How to use your own AI provider
+            onAiSearch={async (query) => {
+                // 1. Call your API
+                // const response = await fetch('/api/ai', { body: JSON.stringify({ query }) });
+                // const data = await response.json();
+                
+                // 2. Return a string for a simple answer
+                // return data.answer; 
+
+                // 3. OR return an array of SpotlightItems for actions
+                // return [{ id: '1', label: 'AI Action', type: 'action', ... }];
+                
+                return "Custom AI handler is not implemented in this demo.";
+            }} 
+            */
             />
         </div>
     );

@@ -57,3 +57,10 @@ yarn-error.log*
 # Agentic & Temporary
 /.gemini
 .agent/
+RELEASE_NOTES.md
+PUBLISH_GUIDE.md
+
+# Temporary Test Scripts
+test.bat
+diagnose.bat
+start_vite.bat

@@ -71,6 +71,8 @@ const Playground = () => {
     const [enableVim, setEnableVim] = useState(false);
     const [enableRecent, setEnableRecent] = useState(true);
     const [enableNested, setEnableNested] = useState(false);
+    const [enableAi, setEnableAi] = useState(false);
+    const [enableAutocomplete, setEnableAutocomplete] = useState(true);
     const [headless, setHeadless] = useState(false);
     const [useLargeDataset, setUseLargeDataset] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -230,7 +232,7 @@ const Playground = () => {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">Spotlight <span className="gradient-text">Playground</span></h1>
-                            <p className="text-xs opacity-50 font-mono">v2.5.0 - 5 New Features! 🎉</p>
+                            <p className="text-xs opacity-50 font-mono">Interactive Demo & Testing Environment</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -299,6 +301,8 @@ const Playground = () => {
                                     { id: 'debug', label: 'Debug Mode', desc: 'Display search scores and latency', icon: <Monitor size={18} />, value: debug, setter: setDebug },
                                     { id: 'google', label: 'Google Search', desc: 'Allow direct web search fallback', icon: <Smartphone size={18} />, value: enableGoogle, setter: setEnableGoogle },
                                     { id: 'history', label: 'Record History', desc: 'Persist search queries locally', icon: <History size={18} />, value: enableRecent, setter: setEnableRecent },
+                                    { id: 'ai', label: 'AI Search', desc: 'Simulate AI intent detection', icon: <Zap size={18} />, value: enableAi, setter: setEnableAi },
+                                    { id: 'autocomplete', label: 'Autocomplete', desc: 'Show ghost text and Tab completion', icon: <Code size={18} />, value: enableAutocomplete, setter: setEnableAutocomplete },
                                     { id: 'nested', label: 'Nested Commands', desc: 'Folder-like navigation structure', icon: <Folder size={18} />, value: enableNested, setter: setEnableNested },
                                     { id: 'vim', label: 'Vim Navigation', desc: 'Support h, j, k, l movement', icon: <Zap size={18} />, value: enableVim, setter: setEnableVim },
                                     { id: 'headless', label: 'Headless Mode', desc: 'Remove default styling (bring your own CSS)', icon: <Code size={18} />, value: headless, setter: setHeadless },
@@ -351,27 +355,27 @@ const Playground = () => {
                         </div>
 
                         <div className="glass-card p-8 bg-blue-600/5 border-blue-500/20">
-                            <h3 className="text-sm font-semibold opacity-70 mb-4 uppercase tracking-wider">✨ New in v2.5.0</h3>
+                            <h3 className="text-sm font-semibold opacity-70 mb-4 uppercase tracking-wider">✨ Latest Features</h3>
                             <ul className="space-y-4">
                                 <li className="flex items-center gap-3 text-sm">
-                                    <Code size={16} className="text-purple-500" />
-                                    <span><strong>Unit Converter</strong> - 100 km to miles</span>
+                                    <Zap size={16} className="text-purple-500" />
+                                    <span><strong>AI Search</strong> - Intent detection & answers</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-sm">
-                                    <History size={16} className="text-green-500" />
-                                    <span><strong>Recent Searches</strong> - Quick history</span>
+                                    <Code size={16} className="text-blue-500" />
+                                    <span><strong>Regex Mode</strong> - Advanced pattern matching</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-sm">
-                                    <Star size={16} className="text-yellow-500" />
-                                    <span><strong>Bookmarks</strong> - Save favorites</span>
+                                    <Monitor size={16} className="text-emerald-500" />
+                                    <span><strong>Performance</strong> - Fixed UI flicker</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-sm">
-                                    <Keyboard size={16} className="text-indigo-500" />
-                                    <span><strong>Shortcuts Panel</strong> - Type ?</span>
+                                    <Shield size={16} className="text-rose-500" />
+                                    <span><strong>Stability</strong> - Critical bug fixes</span>
                                 </li>
                                 <li className="flex items-center gap-3 text-sm">
-                                    <Zap size={16} className="text-amber-500" />
-                                    <span><strong>Command Aliases</strong> - prefs → Settings</span>
+                                    <Keyboard size={16} className="text-amber-500" />
+                                    <span><strong>Autocomplete</strong> - Ghost text & Tab</span>
                                 </li>
                             </ul>
                         </div>
@@ -392,6 +396,8 @@ const Playground = () => {
                 enableGoogleSearch={enableGoogle}
                 enableVimNavigation={enableVim}
                 enableRecent={enableRecent}
+                enableAi={enableAi}
+                enableAutocomplete={enableAutocomplete}
                 headless={headless}
                 classNames={headless ? {
                     backdrop: 'fixed inset-0 bg-black/50',

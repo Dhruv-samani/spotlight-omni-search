@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Spotlight } from '../components/Spotlight';
+import { SpotlightOmni } from '../components/SpotlightOmni';
 import { Mail, Settings, User, CreditCard, Calendar, BarChart, Search } from 'lucide-react';
 import { SpotlightItem } from '../types';
 
-const meta: Meta<typeof Spotlight> = {
-    title: 'Components/Spotlight',
-    component: Spotlight,
+const meta: Meta<typeof SpotlightOmni> = {
+    title: 'Components/SpotlightOmni',
+    component: SpotlightOmni,
     parameters: {
         layout: 'fullscreen',
     },
@@ -23,7 +23,7 @@ const meta: Meta<typeof Spotlight> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Spotlight>;
+type Story = StoryObj<typeof SpotlightOmni>;
 
 const items: SpotlightItem[] = [
     { id: '1', label: 'Dashboard', type: 'page', group: 'Navigation', icon: <BarChart size={16} /> },
@@ -61,57 +61,21 @@ export const Virtualized1000Items: Story = {
     }
 };
 
-export const WithAISimulation: Story = {
+export const WithAsyncSearch: Story = {
     args: {
         isOpen: true,
-        items: items,
+        items: [],
         onClose: () => console.log('close'),
-        theme: 'midnight',
-        enableAi: true,
-        searchPlaceholder: 'Try "create user" or "ask time"...'
-    }
-};
-
-export const WithCustomAI: Story = {
-    args: {
-        isOpen: true,
-        items: items,
-        onClose: () => console.log('close'),
-        theme: 'dark',
-        enableAi: true,
-        searchPlaceholder: 'Ask a custom question...',
-        onAiSearch: async (query) => {
-            await new Promise(resolve => setTimeout(resolve, 800)); // Network delay
-            return `I am a custom AI handler! You asked: "${query}". I can return strings or SpotlightItems.`;
-        }
-    }
-};
-
-export const DebugMode: Story = {
-    args: {
-        isOpen: true,
-        items: items,
-        onClose: () => console.log('close'),
+        onNavigate: (path) => console.log('navigate', path),
         theme: 'slate',
-        debug: true,
-        searchPlaceholder: 'Type to see performance metrics below...'
-    }
-};
-
-export const Headless: Story = {
-    args: {
-        isOpen: true,
-        items: items,
-        onClose: () => console.log('close'),
-        headless: true,
-        classNames: {
-            backdrop: 'fixed inset-0 bg-black/50',
-            container: 'bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl mx-auto mt-20 p-4 font-sans',
-            header: 'flex items-center gap-2 mb-4 border-b pb-2',
-            input: 'w-full px-4 py-2 text-lg outline-none bg-transparent',
-            listContainer: 'max-h-96 overflow-y-auto',
-            item: 'px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded flex items-center gap-2',
-            itemSelected: 'px-4 py-3 bg-blue-600 text-white cursor-pointer rounded flex items-center gap-2',
+        searchPlaceholder: 'Search for "temp"...',
+        onSearch: async (query) => {
+            if (!query) return [];
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate latency
+            return [
+                { id: `res-1-${query}`, label: `Result for ${query}`, type: 'search' },
+                { id: `res-2-${query}`, label: `Another result for ${query}`, type: 'search' }
+            ];
         }
     }
 };

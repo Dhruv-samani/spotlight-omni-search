@@ -1,10 +1,13 @@
 # spotlight-omni-search 🔍
 
 [![npm version](https://img.shields.io/npm/v/spotlight-omni-search.svg?style=flat-square)](https://www.npmjs.com/package/spotlight-omni-search)
-[![npm downloads](https://img.shields.io/npm/dm/spotlight-omni-search.svg?style=flat-square)](https://www.npmjs.com/package/spotlight-omni-search)
+
+<!-- [![npm downloads](https://img.shields.io/npm/dm/spotlight-omni-search.svg?style=flat-square)](https://www.npmjs.com/package/spotlight-omni-search) -->
+
 [![bundle size](https://img.shields.io/bundlephobia/minzip/spotlight-omni-search?style=flat-square)](https://bundlephobia.com/package/spotlight-omni-search)
 [![license](https://img.shields.io/npm/l/spotlight-omni-search.svg?style=flat-square)](https://github.com/Dhruv-samani/spotlight-omni-search/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/Dhruv-samani/spotlight-omni-search?style=flat-square)](https://github.com/Dhruv-samani/spotlight-omni-search)
+
+<!-- [![GitHub stars](https://img.shields.io/github/stars/Dhruv-samani/spotlight-omni-search?style=flat-square)](https://github.com/Dhruv-samani/spotlight-omni-search) -->
 
 🔗 **[Live Demo & Documentation](https://spotlight-omni-search-docs.netlify.app/)** | [GitHub](https://github.com/Dhruv-samani/spotlight-omni-search)
 
@@ -22,11 +25,13 @@ A professional, **Tailwind-Native** Spotlight Search component for React and Nex
 - **⭐ Bookmarks** (NEW): Star your favorite commands for quick access.
 - **⌨️ Shortcuts Panel** (NEW): Press `?` to view all keyboard shortcuts.
 - **🏷️ Command Aliases** (NEW): Find commands with alternative names (e.g., "prefs" → "Settings").
+- **🤖 AI Search (NEW)**: Natural language query handling with intent detection.
+- **🔌 Production AI**: Decoupled AI implementation - use your own API keys.
 - **⚡ Performance**: Virtual scrolling for 1000+ items and instant search.
 - **🎨 Theming**: 20+ pre-built themes (Dark, Light, Slate, Blue, etc.).
 - **🛠️ Advanced**: Async search, command arguments, and undo/redo support.
 - **🔒 Privacy**: Built-in data obfuscation for history and recent items.
-- **⌨️ Accessibility**: Full keyboard navigation (`Cmd+K`, Arrow keys).
+- **⌨️ Accessibility**: Full WCAG compliance (`aria-controls`, `aria-activedescendant`).
 - **🎭 Icon Flexibility**: Use any icon library (Lucide, Material, Heroicons) or custom SVGs.
 
 ---
@@ -47,8 +52,8 @@ A professional, **Tailwind-Native** Spotlight Search component for React and Nex
 | **Trigger Button**        | ✅ Pre-styled                   | ❌ Build your own | ❌ Build your own |
 | **Async Search**          | ✅                              | ✅                | ✅                |
 | **Nested Commands**       | ✅ Plugin                       | ✅                | ✅                |
-| **Analytics Plugin**      | ✅ Built-in                     | ❌                | ❌                |
-| **Bundle Size**           | ~15KB gzipped                   | ~12KB             | ~10KB             |
+| **AI Search** (NEW)       | ✅ Intent-aware / Custom        | ❌                | ❌                |
+| **Bundle Size**           | ~45KB minzipped                 | ~12KB             | ~10KB             |
 | **TypeScript**            | ✅                              | ✅                | ✅                |
 
 **Perfect for:** Teams who want a **ready-to-use** command palette with minimal setup and beautiful defaults.
@@ -309,11 +314,41 @@ Supported file types with automatic icons:
 
 ---
 
-## 🎯 Multi-Select Mode (Coming in v3.0.0)
+## 🤖 AI Search & Intent Detection (NEW in v3.1.0)
+
+Bring the power of LLMs to your command palette without the bloat. Spotlight supports both simulated AI for demos and production-ready custom handlers.
+
+### Production AI Integration
+
+Decouple your AI logic and manage your own API costs.
+
+```tsx
+<Spotlight
+  enableAi={true}
+  onAiSearch={async (query) => {
+    // Call your LLM backend (OpenAI, Anthropic, etc.)
+    const response = await fetch("/api/ai-search", {
+      method: "POST",
+      body: JSON.stringify({ query }),
+    });
+
+    // Return a string (for Q&A) or SpotlightItem[] (for navigation/actions)
+    return await response.json();
+  }}
+/>
+```
+
+### Features
+
+- **✨ Intent Detection**: Automatically detects if user wants to "Create", "Ask", or "Navigate".
+- **🔄 Mixed Results**: AI suggestions appear alongside static and async results.
+- **🧠 Answer Overlay**: Beautiful built-in UI for reading long AI responses.
+
+---
+
+## 🎯 Multi-Select Mode (NEW in v3.0.0)
 
 Select multiple items and perform bulk actions - perfect for admin panels and file managers.
-
-> **Note:** Multi-Select Mode is currently in development and will be available in v3.0.0. The API is finalized and ready to use.
 
 ### Planned Features
 

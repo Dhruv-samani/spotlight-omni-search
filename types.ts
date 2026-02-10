@@ -46,6 +46,11 @@ export interface SpotlightItem {
    * Child items for nested navigation
    */
   items?: SpotlightItem[];
+  /**
+   * If true, prevent the Spotlight modal from closing after selecting this item.
+   * Useful for actions that modify the search state (e.g. showing shortcuts).
+   */
+  preventClose?: boolean;
   
   // Tags & Categories
   /**
@@ -286,6 +291,25 @@ export interface SpotlightProps {
    * @default false
    */
   enableGoogleSearch?: boolean;
+
+  /**
+   * Enable inline autocomplete (ghost text) based on top result
+   * @default false
+   */
+  enableAutocomplete?: boolean;
+
+  /**
+   * Enable AI-powered search
+   * @default false
+   */
+  enableAi?: boolean;
+
+  /**
+   * Custom AI search handler.
+   * If provided, this function will be called when AI search is triggered.
+   * It can return a string (which will differ as an AI answer) or a list of SpotlightItems.
+   */
+  onAiSearch?: (query: string) => Promise<string | SpotlightItem[]>;
 
   /**
    * Enable headless mode - removes default styling, allowing full custom styling via classNames
